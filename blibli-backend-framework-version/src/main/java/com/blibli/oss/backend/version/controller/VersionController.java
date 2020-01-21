@@ -1,9 +1,7 @@
 package com.blibli.oss.backend.version.controller;
 
 import com.blibli.oss.backend.version.properties.VersionProperties;
-import lombok.Setter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
