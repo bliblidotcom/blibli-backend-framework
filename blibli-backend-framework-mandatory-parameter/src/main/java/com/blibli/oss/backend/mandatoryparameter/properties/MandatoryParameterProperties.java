@@ -25,13 +25,23 @@ public class MandatoryParameterProperties {
 
     private String storeId = "storeId";
 
+    private String storeIdDefaultValue = "storeId";
+
     private String clientId = "clientId";
+
+    private String clientIdDefaultValue = "clientId";
 
     private String channelId = "channelId";
 
+    private String channelIdDefaultValue = "channelId";
+
     private String username = "username";
 
+    private String usernameDefaultValue = "username";
+
     private String requestId = "requestId";
+
+    private String requestIdDefaultValue = "requestId";
 
   }
 
@@ -43,13 +53,23 @@ public class MandatoryParameterProperties {
 
     private String storeId = "storeId";
 
+    private String storeIdDefaultValue = "storeId";
+
     private String clientId = "clientId";
+
+    private String clientIdDefaultValue = "clientId";
 
     private String channelId = "channelId";
 
+    private String channelIdDefaultValue = "channelId";
+
     private String username = "username";
 
+    private String usernameDefaultValue = "username";
+
     private String requestId = "requestId";
+
+    private String requestIdDefaultValue = "requestId";
 
   }
 
