@@ -1,7 +1,7 @@
 package com.blibli.oss.backend.mandatoryparameter.webflux;
 
 import com.blibli.oss.backend.mandatoryparameter.model.MandatoryParameter;
-import com.blibli.oss.backend.mandatoryparameter.properties.MandatoryParameterProperties;
+import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterSwaggerProperties;
 import lombok.AllArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class MandatoryParameterHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
-  private MandatoryParameterProperties properties;
+  private MandatoryParameterSwaggerProperties properties;
 
   @Override
   public boolean supportsParameter(MethodParameter parameter) {

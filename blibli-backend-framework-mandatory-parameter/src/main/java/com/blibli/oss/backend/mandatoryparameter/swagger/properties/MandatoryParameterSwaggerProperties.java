@@ -1,4 +1,4 @@
-package com.blibli.oss.backend.mandatoryparameter.properties;
+package com.blibli.oss.backend.mandatoryparameter.swagger.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +10,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ConfigurationProperties("blibli.backend.mandatoryparameter")
-public class MandatoryParameterProperties {
+@ConfigurationProperties("blibli.backend.mandatoryparameter.swagger")
+public class MandatoryParameterSwaggerProperties {
 
   private QueryKey queryKey = new QueryKey();
 
