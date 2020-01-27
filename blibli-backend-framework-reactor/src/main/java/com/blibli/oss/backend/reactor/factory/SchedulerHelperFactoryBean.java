@@ -113,12 +113,7 @@ public class SchedulerHelperFactoryBean implements FactoryBean<SchedulerHelper> 
 
     @Override
     public Scheduler of(String name) {
-      Scheduler scheduler = schedulers.get(name);
-      if (scheduler == null) {
-        return Schedulers.immediate();
-      } else {
-        return scheduler;
-      }
+      return schedulers.getOrDefault(name, Schedulers.immediate());
     }
   }
 }
