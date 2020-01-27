@@ -103,7 +103,7 @@ public class SchedulerHelperFactoryBean implements FactoryBean<SchedulerHelper> 
   }
 
   private Scheduler newElasticScheduler(SchedulerProperties.SchedulerNewElasticProperties properties) {
-    return Schedulers.newElastic(properties.getName(), properties.getTtlSeconds(), properties.getDaemon());
+    return Schedulers.newElastic(properties.getName(), (int) properties.getTtl().getSeconds(), properties.getDaemon());
   }
 
   @AllArgsConstructor

@@ -36,7 +36,7 @@ public class SchedulerProperties {
 
     private String name;
 
-    private Integer ttlSeconds = 60;
+    private Duration ttl = Duration.ofSeconds(60);
 
     private Boolean daemon = false;
 
