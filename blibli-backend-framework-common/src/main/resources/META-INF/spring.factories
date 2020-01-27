@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.blibli.oss.backend.common.CommonAutoConfiguration,\
+  com.blibli.oss.backend.common.CommonWebFluxAutoConfiguration
