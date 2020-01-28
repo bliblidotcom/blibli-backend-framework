@@ -13,6 +13,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.blibli.oss</groupId>
+      <artifactId>blibli-backend-framework-swagger</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>

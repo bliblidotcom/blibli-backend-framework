@@ -21,6 +21,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PagingRequestArgumentResolver implements HandlerMethodArgumentResolver {
 
+  public static final String SORT_BY_SEPARATOR = ":";
+  public static final String SORT_BY_SPLITTER = ",";
+  public static final String EMPTY_STRING = "";
+
   private final PagingProperties pagingProperties;
 
   @Override
@@ -73,7 +77,7 @@ public class PagingRequestArgumentResolver implements HandlerMethodArgumentResol
   }
 
   public List<SortBy> toSortByList(String request, PagingProperties pagingProperties) {
-    return Arrays.stream(request.split(","))
+    return Arrays.stream(request.split(SORT_BY_SPLITTER))
       .map(s -> toSortBy(s, pagingProperties))
       .filter(Objects::nonNull)
       .filter(sortBy -> Objects.nonNull(sortBy.getPropertyName()))
@@ -83,11 +87,11 @@ public class PagingRequestArgumentResolver implements HandlerMethodArgumentResol
 
   public SortBy toSortBy(String request, PagingProperties pagingProperties) {
     String sort = request.trim();
-    if (StringUtils.isEmpty(sort.replaceAll(":", "")) || sort.startsWith(":")) {
+    if (StringUtils.isEmpty(sort.replaceAll(SORT_BY_SEPARATOR, EMPTY_STRING)) || sort.startsWith(SORT_BY_SEPARATOR)) {
       return null;
     }
 
-    String[] sortBy = sort.split(":");
+    String[] sortBy = sort.split(SORT_BY_SEPARATOR);
 
     return new SortBy(
       getAt(sortBy, 0, null),
