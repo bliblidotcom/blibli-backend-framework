@@ -1,7 +1,7 @@
 package com.blibli.oss.backend.common.helper;
 
-import com.blibli.oss.backend.common.model.response.Paging;
 import com.blibli.oss.backend.common.model.request.PagingRequest;
+import com.blibli.oss.backend.common.model.response.Paging;
 
 public class PagingHelper {
 
@@ -11,6 +11,7 @@ public class PagingHelper {
       .totalItem(totalItem)
       .totalPage(totalPage)
       .itemPerPage(request.getItemPerPage())
+      .sortBy(request.getSortBy())
       .build();
   }
 
