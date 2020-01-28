@@ -10,11 +10,15 @@ import java.util.Map;
 public class ResponseHelper {
 
   public static <T> Response<T> ok() {
-    return ResponseHelper.status(HttpStatus.OK);
+    return ResponseHelper.ok(null);
   }
 
   public static <T> Response<T> ok(T data) {
-    return ResponseHelper.status(HttpStatus.OK, data);
+    return ResponseHelper.ok(data, null);
+  }
+
+  public static <T> Response<T> ok(T data, Paging paging) {
+    return ResponseHelper.status(HttpStatus.OK, data, paging);
   }
 
   public static <T> Response<T> internalServerError() {
