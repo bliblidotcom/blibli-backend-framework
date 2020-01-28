@@ -1,18 +1,26 @@
 package com.blibli.oss.backend.common.webflux.controller;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.BodyInserters;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -21,19 +29,54 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 )
 public class CommonErrorControllerTest {
 
+  @Autowired
+  private WebTestClient webTestClient;
+
+  @Test
+  void testThrowable() {
+    webTestClient.get()
+      .uri("/Throwable")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  void test() {
+    webTestClient.post()
+      .uri("/MethodArgumentNotValidException")
+      .body(BodyInserters.fromValue(Application.HelloRequest.builder().build()))
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
   @SpringBootApplication
   public static class Application {
 
+    @Service
+    @Validated
+    public static class ExampleService {
+
+      @Validated
+      public void validated(@Valid HelloRequest request){
+
+      }
+
+    }
+
     @RestController
     public static class ExampleController {
+
+      @Autowired
+      private ExampleService exampleService;
 
       @GetMapping("/Throwable")
       public String throwable() throws Throwable {
         throw new Throwable("Internal Server Error");
       }
 
-      @GetMapping("/MethodArgumentNotValidException")
-      public String methodArgumentNotValidException() {
+      @PostMapping(value = "/MethodArgumentNotValidException", consumes = MediaType.APPLICATION_JSON_VALUE)
+      public String methodArgumentNotValidException(@RequestBody HelloRequest request) {
+        exampleService.validated(request);
         return "OK";
       }
 
@@ -101,6 +144,16 @@ public class CommonErrorControllerTest {
       public Logger getLogger() {
         return log;
       }
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class HelloRequest {
+
+      @NotBlank
+      private String name;
     }
 
   }

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
 import java.util.*;
 
 public interface CommonErrorController {
@@ -22,28 +24,6 @@ public interface CommonErrorController {
   Logger getLogger();
 
   MessageSource getMessageSource();
-
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  default Response<Object> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-    getLogger().warn(MethodArgumentNotValidException.class.getName(), e);
-    Response<Object> response = new Response<>();
-    response.setCode(HttpStatus.BAD_REQUEST.value());
-    response.setStatus(HttpStatus.BAD_REQUEST.name());
-    response.setErrors(from(e.getBindingResult(), getMessageSource()));
-    return response;
-  }
-
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @ExceptionHandler(BindException.class)
-  default Response<Object> bindException(BindException e) {
-    getLogger().warn(BindException.class.getName(), e);
-    Response<Object> response = new Response<>();
-    response.setCode(HttpStatus.BAD_REQUEST.value());
-    response.setStatus(HttpStatus.BAD_REQUEST.name());
-    response.setErrors(from(e.getBindingResult(), getMessageSource()));
-    return response;
-  }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -181,6 +161,51 @@ public interface CommonErrorController {
     } else {
       return Collections.emptyMap();
     }
+  }
+
+  static Map<String, List<String>> from(Set<ConstraintViolation<?>> constraintViolations) {
+    Map<String, List<String>> map = new HashMap<>();
+
+    constraintViolations.forEach(violation -> {
+      for (String attribute : getAttributes(violation)) {
+        putEntry(map, attribute, violation.getMessage());
+      }
+    });
+
+    return map;
+  }
+
+  static void putEntry(Map<String, List<String>> map, String key, String value) {
+    if (!map.containsKey(key)) {
+      map.put(key, new ArrayList<>());
+    }
+    map.get(key).add(value);
+  }
+
+  static String[] getAttributes(ConstraintViolation<?> constraintViolation) {
+    String[] values = (String[]) constraintViolation.getConstraintDescriptor().getAttributes().get("path");
+    if (values == null || values.length == 0) {
+      return getAttributesFromPath(constraintViolation);
+    } else {
+      return values;
+    }
+  }
+
+  static String[] getAttributesFromPath(ConstraintViolation<?> constraintViolation) {
+    Path path = constraintViolation.getPropertyPath();
+
+    StringBuilder builder = new StringBuilder();
+    path.forEach(node -> {
+      if (node.getName() != null) {
+        if (builder.length() > 0) {
+          builder.append(".");
+        }
+
+        builder.append(node.getName());
+      }
+    });
+
+    return new String[]{builder.toString()};
   }
 
 }
