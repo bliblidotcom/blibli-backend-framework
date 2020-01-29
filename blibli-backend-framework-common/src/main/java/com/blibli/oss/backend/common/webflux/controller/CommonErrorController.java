@@ -6,16 +6,15 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.*;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import java.util.*;
 
@@ -63,7 +62,7 @@ public interface CommonErrorController {
   }
 
   @ExceptionHandler(WebExchangeBindException.class)
-  default ResponseEntity<Response<Object>> serverWebInputException(WebExchangeBindException e) {
+  default ResponseEntity<Response<Object>> webExchangeBindException(WebExchangeBindException e) {
     getLogger().warn(WebExchangeBindException.class.getName(), e);
 
     Response<Object> response = new Response<>();
@@ -72,6 +71,18 @@ public interface CommonErrorController {
     response.setErrors(from(e.getBindingResult(), getMessageSource()));
 
     return ResponseEntity.status(e.getStatus()).body(response);
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  default ResponseEntity<Response<Object>> constraintViolationException(ConstraintViolationException e) {
+    getLogger().warn(ConstraintViolationException.class.getName(), e);
+
+    Response<Object> response = new Response<>();
+    response.setCode(HttpStatus.BAD_REQUEST.value());
+    response.setStatus(HttpStatus.BAD_REQUEST.name());
+    response.setErrors(from(e.getConstraintViolations()));
+
+    return ResponseEntity.badRequest().body(response);
   }
 
   @ExceptionHandler(ResponseStatusException.class)

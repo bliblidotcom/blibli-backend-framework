@@ -10,14 +10,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.StandardReflectionParameterNameDiscoverer;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.server.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -41,27 +46,91 @@ public class CommonErrorControllerTest {
   }
 
   @Test
-  void test() {
+  void testConstraintViolationException() {
     webTestClient.post()
-      .uri("/MethodArgumentNotValidException")
+      .uri("/ConstraintViolationException")
       .body(BodyInserters.fromValue(Application.HelloRequest.builder().build()))
       .exchange()
       .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
   }
 
+  @Test
+  void testWebExchangeBindException() {
+    webTestClient.post()
+      .uri("/WebExchangeBindException")
+      .body(BodyInserters.fromValue(Application.HelloRequest.builder().build()))
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  void testHttpMessageNotReadableException() {
+    webTestClient.get()
+      .uri("/HttpMessageNotReadableException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  void testServerWebInputException() {
+    webTestClient.get()
+      .uri("/ServerWebInputException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  @Test
+  void testResponseStatusException() {
+    webTestClient.get()
+      .uri("/ResponseStatusException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.UNAUTHORIZED)
+      .expectBody()
+      .jsonPath("$.errors.reason").isEqualTo("Ups");
+  }
+
+  @Test
+  void testMediaTypeNotSupportedStatusException() {
+    webTestClient.get()
+      .uri("/MediaTypeNotSupportedStatusException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+  }
+
+  @Test
+  void testNotAcceptableStatusException() {
+    webTestClient.get()
+      .uri("/NotAcceptableStatusException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.NOT_ACCEPTABLE);
+  }
+
+  @Test
+  void testUnsupportedMediaTypeStatusException() {
+    webTestClient.get()
+      .uri("/UnsupportedMediaTypeStatusException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+  }
+
+  @Test
+  void testMethodNotAllowedException() {
+    webTestClient.post()
+      .uri("/MethodNotAllowedException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
+  }
+
+  @Test
+  void testServerErrorException() {
+    webTestClient.get()
+      .uri("/ServerErrorException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
   @SpringBootApplication
   public static class Application {
-
-    @Service
-    @Validated
-    public static class ExampleService {
-
-      @Validated
-      public void validated(@Valid HelloRequest request){
-
-      }
-
-    }
 
     @RestController
     public static class ExampleController {
@@ -74,50 +143,47 @@ public class CommonErrorControllerTest {
         throw new Throwable("Internal Server Error");
       }
 
-      @PostMapping(value = "/MethodArgumentNotValidException", consumes = MediaType.APPLICATION_JSON_VALUE)
-      public String methodArgumentNotValidException(@RequestBody HelloRequest request) {
+      @PostMapping(value = "/ConstraintViolationException", consumes = MediaType.APPLICATION_JSON_VALUE)
+      public String constraintViolationException(@RequestBody HelloRequest request) {
         exampleService.validated(request);
         return "OK";
       }
 
-      @GetMapping("/BindException")
-      public String bindException() {
+      @PostMapping(value = "/WebExchangeBindException", consumes = MediaType.APPLICATION_JSON_VALUE)
+      public String webExchangeBindException(@RequestBody @Validated HelloRequest request) {
         return "OK";
       }
 
       @GetMapping("/HttpMessageNotReadableException")
       public String httpMessageNotReadableException() {
-        return "OK";
+        throw new HttpMessageNotReadableException(null, (HttpInputMessage) null);
       }
 
       @GetMapping("/ServerWebInputException")
-      public String serverWebInputException() {
-        return "OK";
-      }
-
-      @GetMapping("/WebExchangeBindException")
-      public String webExchangeBindException() {
-        return "OK";
+      public String serverWebInputException() throws NoSuchMethodException {
+        MethodParameter methodParameter = MethodParameter.forParameter(ExampleService.class.getMethod("validated", HelloRequest.class).getParameters()[0]);
+        methodParameter.initParameterNameDiscovery(new StandardReflectionParameterNameDiscoverer());
+        throw new ServerWebInputException("Ups", methodParameter);
       }
 
       @GetMapping("/ResponseStatusException")
       public String responseStatusException() {
-        return "OK";
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Ups");
       }
 
-      @GetMapping("/MediaTypeNotSupportedStatusException")
+      @GetMapping(value = "/MediaTypeNotSupportedStatusException")
       public String mediaTypeNotSupportedStatusException() {
-        return "OK";
+        throw new MediaTypeNotSupportedStatusException("Ups");
       }
 
-      @GetMapping("/NotAcceptableStatusException")
+      @GetMapping(value = "/NotAcceptableStatusException")
       public String notAcceptableStatusException() {
-        return "OK";
+        throw new NotAcceptableStatusException("Ups");
       }
 
       @GetMapping("/UnsupportedMediaTypeStatusException")
       public String unsupportedMediaTypeStatusException() {
-        return "OK";
+        throw new UnsupportedMediaTypeStatusException("Ups");
       }
 
       @GetMapping("/MethodNotAllowedException")
@@ -127,7 +193,18 @@ public class CommonErrorControllerTest {
 
       @GetMapping("/ServerErrorException")
       public String serverErrorException() {
-        return "OK";
+        throw new ServerErrorException("Ups", new NullPointerException());
+      }
+
+    }
+
+    @Service
+    @Validated
+    public static class ExampleService {
+
+      @Validated
+      public void validated(@Valid HelloRequest request) {
+
       }
 
     }
