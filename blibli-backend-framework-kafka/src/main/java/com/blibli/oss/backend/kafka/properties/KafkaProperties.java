@@ -23,7 +23,7 @@ public class KafkaProperties {
   @NoArgsConstructor
   public static class KafkaProducerProperties {
 
-    private boolean enabled;
+    private boolean logging;
 
   }
 
@@ -33,7 +33,7 @@ public class KafkaProperties {
   @NoArgsConstructor
   public static class KafkaConsumerProperties {
 
-    private boolean enabled;
+    private boolean logging;
 
   }
 
