@@ -1,41 +1,94 @@
-/*
- * Copyright 2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.blibli.oss.backend.kafka.producer;
 
+import com.blibli.oss.backend.kafka.interceptor.InterceptorUtil;
+import com.blibli.oss.backend.kafka.interceptor.KafkaProducerInterceptor;
+import com.blibli.oss.backend.kafka.model.ProducerEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.Headers;
+import org.apache.kafka.common.header.internals.RecordHeaders;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import rx.Single;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 
-/**
- * @author Eko Kurniawan Khannedy
- */
-public interface KafkaProducer {
+import java.util.List;
+import java.util.Objects;
 
-  Single<SendResult<String, String>> send(String topic, String key, Object message, Integer partition, Long timestamp);
+@AllArgsConstructor
+public class KafkaProducer {
 
-  default Single<SendResult<String, String>> send(String topic, String key, Object message, Integer partition) {
-    return send(topic, key, message, null, null);
+  private KafkaTemplate<String, String> kafkaTemplate;
+
+  private ObjectMapper objectMapper;
+
+  private List<KafkaProducerInterceptor> producerInterceptors;
+
+  public Disposable sendAndSubscribe(String topic, String key, Object value, Scheduler scheduler) {
+    return sendOn(topic, key, value, scheduler)
+      .subscribe();
   }
 
-  default Single<SendResult<String, String>> send(String topic, String key, Object message) {
-    return send(topic, key, message, null);
+  public Disposable sendAndSubscribe(ProducerEvent producerEvent, Scheduler scheduler) {
+    return sendOn(producerEvent, scheduler)
+      .subscribe();
   }
 
-  default Single<SendResult<String, String>> send(String topic, Object message) {
-    return send(topic, null, message);
+  public Mono<SendResult<String, String>> sendOn(String topic, String key, Object value, Scheduler scheduler) {
+    return send(topic, key, value)
+      .subscribeOn(scheduler);
+  }
+
+  public Mono<SendResult<String, String>> sendOn(ProducerEvent producerEvent, Scheduler scheduler) {
+    return send(producerEvent)
+      .subscribeOn(scheduler);
+  }
+
+  public Mono<SendResult<String, String>> send(String topic, String key, Object value) {
+    return Mono.fromCallable(() -> ProducerEvent.builder().topic(topic).key(key).value(value).build())
+      .flatMap(this::send);
+  }
+
+  public Mono<SendResult<String, String>> send(ProducerEvent producerEvent) {
+    return Mono.just(producerEvent)
+      .map(event -> InterceptorUtil.intercepts(event, producerInterceptors))
+      .flatMap(event -> sendWithKafkaTemplate(toProducerRecord(event)));
+  }
+
+  private Mono<SendResult<String, String>> sendWithKafkaTemplate(ProducerRecord<String, String> producerRecord) {
+    return Mono.create(sink -> kafkaTemplate.send(producerRecord)
+      .addCallback(sink::success, sink::error));
+  }
+
+  private ProducerRecord<String, String> toProducerRecord(ProducerEvent event) {
+    return new ProducerRecord<>(
+      event.getTopic(),
+      event.getPartition(),
+      event.getTimestamp(),
+      event.getKey(),
+      getValue(event),
+      getHeaders(event)
+    );
+  }
+
+  private Headers getHeaders(ProducerEvent event) {
+    if (Objects.isNull(event.getHeaders())) {
+      return new RecordHeaders();
+    } else {
+      return event.getHeaders();
+    }
+  }
+
+  @SneakyThrows
+  private String getValue(ProducerEvent event) {
+    if (event.getValue() instanceof String) {
+      return (String) event.getValue();
+    } else {
+      return objectMapper.writeValueAsString(event.getValue());
+    }
   }
 
 }
