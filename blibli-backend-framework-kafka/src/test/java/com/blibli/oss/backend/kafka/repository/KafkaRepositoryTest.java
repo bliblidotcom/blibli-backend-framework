@@ -68,6 +68,14 @@ public class KafkaRepositoryTest {
     Product product = objectMapper.readValue(record.value(), Product.class);
     Assertions.assertEquals(product.getId(), "id");
     Assertions.assertEquals(product.getName(), "name");
+
+    productKafkaRepository.sendAndSubscribe(TOPIC, Product.builder().id("id").name("name").build(), Schedulers.elastic());
+    record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
+
+    Assertions.assertEquals(record.key(), "id");
+    product = objectMapper.readValue(record.value(), Product.class);
+    Assertions.assertEquals(product.getId(), "id");
+    Assertions.assertEquals(product.getName(), "name");
   }
 
   @Test
