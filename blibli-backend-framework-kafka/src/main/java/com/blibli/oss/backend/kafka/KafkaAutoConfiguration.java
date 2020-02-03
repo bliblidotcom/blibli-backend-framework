@@ -4,6 +4,7 @@ import com.blibli.oss.backend.kafka.interceptor.InterceptorUtil;
 import com.blibli.oss.backend.kafka.interceptor.log.LogKafkaProducerInterceptor;
 import com.blibli.oss.backend.kafka.producer.KafkaProducer;
 import com.blibli.oss.backend.kafka.properties.KafkaProperties;
+import com.blibli.oss.backend.kafka.repository.KafkaProducerAwareProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Setter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,4 +34,10 @@ public class KafkaAutoConfiguration implements ApplicationContextAware {
     interceptor.setKafkaProperties(kafkaProperties);
     return interceptor;
   }
+
+  @Bean
+  public KafkaProducerAwareProcessor kafkaProducerAwareProcessor(KafkaProducer kafkaProducer) {
+    return new KafkaProducerAwareProcessor(kafkaProducer);
+  }
+
 }

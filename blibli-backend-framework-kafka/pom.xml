@@ -44,6 +44,10 @@
       <artifactId>reactor-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.projectreactor.kafka</groupId>
+      <artifactId>reactor-kafka</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.projectreactor</groupId>
       <artifactId>reactor-test</artifactId>
       <scope>test</scope>
