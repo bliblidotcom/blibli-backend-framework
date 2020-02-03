@@ -8,7 +8,7 @@ public interface KafkaKeyAnnotationAware<T> {
 
   @SneakyThrows
   default String getKey(T data) {
-    String key = KafkaKeyHelper.getKafkaKey(data);
+    String key = KafkaHelper.getKafkaKey(data);
     if (Objects.isNull(key)) {
       throw new NullPointerException(String.format("No annotation @KafkaKey on class %s", data.getClass().getName()));
     } else {

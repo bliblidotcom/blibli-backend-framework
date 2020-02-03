@@ -3,7 +3,6 @@ package com.blibli.oss.backend.kafka.interceptor;
 import com.blibli.oss.backend.kafka.model.ProducerEvent;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.OrderComparator;
 
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
 package com.blibli.oss.backend.kafka.repository;
 
 import com.blibli.oss.backend.kafka.annotation.KafkaKey;
+import com.blibli.oss.backend.kafka.annotation.KafkaTopic;
 import com.blibli.oss.backend.kafka.producer.helper.KafkaHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +62,7 @@ public class KafkaRepositoryTest {
 
   @Test
   void testProductSuccess() throws JsonProcessingException {
-    productKafkaRepository.sendAndSubscribe(TOPIC, Product.builder().id("id").name("name").build(), Schedulers.elastic());
+    productKafkaRepository.sendAndSubscribe(Product.builder().id("id").name("name").build(), Schedulers.elastic());
     ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
 
     Assertions.assertEquals(record.key(), "id");
@@ -69,7 +70,7 @@ public class KafkaRepositoryTest {
     Assertions.assertEquals(product.getId(), "id");
     Assertions.assertEquals(product.getName(), "name");
 
-    productKafkaRepository.sendAndSubscribe(TOPIC, Product.builder().id("id").name("name").build(), Schedulers.elastic());
+    productKafkaRepository.sendAndSubscribe(Product.builder().id("id").name("name").build(), Schedulers.elastic());
     record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
 
     Assertions.assertEquals(record.key(), "id");
@@ -80,7 +81,7 @@ public class KafkaRepositoryTest {
 
   @Test
   void testCustomerSuccess() throws JsonProcessingException {
-    customerKafkaRepository.sendAndSubscribe(TOPIC, Customer.builder().id("id").name("name").build(), Schedulers.elastic());
+    customerKafkaRepository.sendAndSubscribe(Customer.builder().id("id").name("name").build(), Schedulers.elastic());
     ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
 
     Assertions.assertEquals(record.key(), "id");
@@ -121,6 +122,7 @@ public class KafkaRepositoryTest {
   @Builder
   @AllArgsConstructor
   @NoArgsConstructor
+  @KafkaTopic(KafkaRepositoryTest.TOPIC)
   public static class Customer {
 
     @KafkaKey
@@ -134,6 +136,7 @@ public class KafkaRepositoryTest {
   @Builder
   @AllArgsConstructor
   @NoArgsConstructor
+  @KafkaTopic(KafkaRepositoryTest.TOPIC)
   public static class Product {
 
     @KafkaKey
