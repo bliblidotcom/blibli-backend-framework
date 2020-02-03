@@ -6,7 +6,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 @AllArgsConstructor
-public class KafkaProducerAwareProcessor implements BeanPostProcessor {
+public class KafkaProducerAwareBeanProcessor implements BeanPostProcessor {
 
   private KafkaProducer kafkaProducer;
 

@@ -54,7 +54,7 @@ public class KafkaProducer {
 
   public Mono<SendResult<String, String>> send(ProducerEvent producerEvent) {
     return Mono.just(producerEvent)
-      .map(event -> InterceptorUtil.intercepts(event, producerInterceptors))
+      .map(event -> InterceptorUtil.fireBeforeSend(event, producerInterceptors))
       .flatMap(event -> sendWithKafkaTemplate(toProducerRecord(event)));
   }
 

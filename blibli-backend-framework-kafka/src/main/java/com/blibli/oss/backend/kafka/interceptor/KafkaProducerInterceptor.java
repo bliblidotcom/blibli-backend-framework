@@ -4,6 +4,8 @@ import com.blibli.oss.backend.kafka.model.ProducerEvent;
 
 public interface KafkaProducerInterceptor {
 
-  ProducerEvent beforeSend(ProducerEvent event);
+  default ProducerEvent beforeSend(ProducerEvent event) {
+    return event;
+  }
 
 }

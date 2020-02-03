@@ -13,27 +13,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("blibli.backend.kafka")
 public class KafkaProperties {
 
-  private KafkaProducerProperties producer = new KafkaProducerProperties();
-
-  private KafkaConsumerProperties consumer = new KafkaConsumerProperties();
+  private LoggingProperties logging = new LoggingProperties();
 
   @Data
   @Builder
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class KafkaProducerProperties {
+  public static class LoggingProperties {
 
-    private boolean logging;
+    private boolean beforeSend = false;
 
-  }
+    private boolean beforeConsume = false;
 
-  @Data
-  @Builder
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class KafkaConsumerProperties {
+    private boolean afterSuccessConsume = false;
 
-    private boolean logging;
+    private boolean afterFailedConsume = false;
 
   }
 
