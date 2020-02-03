@@ -2,10 +2,11 @@ package com.blibli.oss.backend.kafka.repository;
 
 import com.blibli.oss.backend.kafka.annotation.KafkaKey;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class KafkaKeyHelper {
@@ -31,13 +32,11 @@ public class KafkaKeyHelper {
     }
 
     return fieldCache.computeIfAbsent(name, s -> {
-      Field[] fields = data.getClass().getDeclaredFields();
-      for (Field value : fields) {
-        KafkaKey annotation = value.getAnnotation(KafkaKey.class);
-        if (Objects.nonNull(annotation)) {
-          value.setAccessible(true);
-          return value;
-        }
+      List<Field> fieldsListWithAnnotation = FieldUtils.getFieldsListWithAnnotation(data.getClass(), KafkaKey.class);
+      if (!fieldsListWithAnnotation.isEmpty()) {
+        Field value = fieldsListWithAnnotation.get(0);
+        value.setAccessible(true);
+        return value;
       }
       return null;
     });
