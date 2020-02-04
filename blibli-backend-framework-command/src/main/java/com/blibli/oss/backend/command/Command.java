@@ -1,8 +1,9 @@
 package com.blibli.oss.backend.command;
 
+import com.blibli.oss.backend.command.cache.CommandCacheable;
 import reactor.core.publisher.Mono;
 
-public interface Command<R, T> {
+public interface Command<R, T> extends CommandCacheable<R, T> {
 
   Mono<T> execute(R request);
 
