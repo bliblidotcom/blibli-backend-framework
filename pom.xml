@@ -36,6 +36,7 @@
     <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
     <springdoc.version>1.2.26</springdoc.version>
     <blibli-framework.version>${project.version}</blibli-framework.version>
+    <embedded.redis.version>0.6</embedded.redis.version>
   </properties>
 
   <dependencyManagement>
@@ -46,6 +47,12 @@
         <version>${spring-cloud.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.github.kstyrc</groupId>
+        <artifactId>embedded-redis</artifactId>
+        <version>${embedded.redis.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>com.blibli.oss</groupId>

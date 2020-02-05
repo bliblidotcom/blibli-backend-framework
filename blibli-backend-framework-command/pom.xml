@@ -61,9 +61,12 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>com.blibli.oss</groupId>
+      <artifactId>blibli-backend-framework-common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.github.kstyrc</groupId>
       <artifactId>embedded-redis</artifactId>
-      <version>0.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
