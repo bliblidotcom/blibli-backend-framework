@@ -37,6 +37,7 @@
     <springdoc.version>1.2.26</springdoc.version>
     <blibli-framework.version>${project.version}</blibli-framework.version>
     <embedded.redis.version>0.6</embedded.redis.version>
+    <wiremock.version>2.25.1</wiremock.version>
   </properties>
 
   <dependencyManagement>
@@ -113,6 +114,11 @@
         <groupId>org.springdoc</groupId>
         <artifactId>springdoc-openapi-webflux-ui</artifactId>
         <version>${springdoc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.tomakehurst</groupId>
+        <artifactId>wiremock-jre8</artifactId>
+        <version>${wiremock.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
