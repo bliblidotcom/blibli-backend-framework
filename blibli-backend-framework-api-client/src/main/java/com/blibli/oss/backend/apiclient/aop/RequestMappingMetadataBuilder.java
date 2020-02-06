@@ -52,20 +52,12 @@ public class RequestMappingMetadataBuilder {
 
   private String name;
 
-  private AnnotationMetadata annotationMetadata;
-
-  private ObjectMapper objectMapper;
-
   public RequestMappingMetadataBuilder(ApplicationContext applicationContext,
                                        Class<?> type,
-                                       String name,
-                                       AnnotationMetadata annotationMetadata,
-                                       ObjectMapper objectMapper) {
+                                       String name) {
     this.applicationContext = applicationContext;
     this.type = type;
     this.name = name;
-    this.annotationMetadata = annotationMetadata;
-    this.objectMapper = objectMapper;
   }
 
   private void prepareProperties() {

@@ -74,8 +74,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   private void prepareAttribute() {
-    metadata = new RequestMappingMetadataBuilder(applicationContext, type, name, annotationMetadata, objectMapper)
-      .build();
+    metadata = new RequestMappingMetadataBuilder(applicationContext, type, name).build();
   }
 
   private void prepareWebClient() {
