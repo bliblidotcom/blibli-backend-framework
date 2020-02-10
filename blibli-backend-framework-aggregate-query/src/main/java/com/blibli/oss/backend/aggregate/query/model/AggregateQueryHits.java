@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AggregateQueryHits {
+public class AggregateQueryHits<T> {
 
   private Long total;
 
   private Double maxScore;
 
-  private List<AggregateQueryHit> hits;
+  private List<AggregateQueryHit<T>> hits;
 
-  public <T> List<T> as(ObjectMapper objectMapper, Class<T> tClass) {
+  public <R> List<R> as(ObjectMapper objectMapper, Class<R> tClass) {
     return hits.stream()
       .map(item -> item.as(objectMapper, tClass))
       .collect(Collectors.toList());

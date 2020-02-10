@@ -6,13 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AggregateQueryHit {
+public class AggregateQueryHit<T> {
 
   private String index;
 
@@ -22,9 +20,9 @@ public class AggregateQueryHit {
 
   private Double score;
 
-  private Map<String, Object> source;
+  private T source;
 
-  public <T> T as(ObjectMapper objectMapper, Class<T> tClass) {
+  public <R> R as(ObjectMapper objectMapper, Class<R> tClass) {
     return objectMapper.convertValue(source, tClass);
   }
 

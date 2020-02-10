@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AggregateQueryResponse {
+public class AggregateQueryResponse<T> {
 
   private Integer took;
 
   private Boolean timedOut;
 
-  private AggregateQueryHits hits;
+  private AggregateQueryHits<T> hits;
 
 }
