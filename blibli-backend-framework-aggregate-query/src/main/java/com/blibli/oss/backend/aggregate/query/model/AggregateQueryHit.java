@@ -22,7 +22,7 @@ public class AggregateQueryHit<T> {
 
   private T source;
 
-  public <R> R as(ObjectMapper objectMapper, Class<R> tClass) {
+  public <R> R sourceAs(ObjectMapper objectMapper, Class<R> tClass) {
     return objectMapper.convertValue(source, tClass);
   }
 

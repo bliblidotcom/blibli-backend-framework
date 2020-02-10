@@ -21,9 +21,9 @@ public class AggregateQueryHits<T> {
 
   private List<AggregateQueryHit<T>> hits;
 
-  public <R> List<R> as(ObjectMapper objectMapper, Class<R> tClass) {
+  public <R> List<R> hitsAs(ObjectMapper objectMapper, Class<R> tClass) {
     return hits.stream()
-      .map(item -> item.as(objectMapper, tClass))
+      .map(item -> item.sourceAs(objectMapper, tClass))
       .collect(Collectors.toList());
   }
 

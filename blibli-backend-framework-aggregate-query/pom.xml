@@ -13,6 +13,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>elasticsearch-rest-high-level-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.blibli.oss</groupId>
       <artifactId>blibli-backend-framework-api-client</artifactId>
     </dependency>

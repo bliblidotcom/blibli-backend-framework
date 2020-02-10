@@ -38,6 +38,7 @@
     <blibli-framework.version>${project.version}</blibli-framework.version>
     <embedded.redis.version>0.6</embedded.redis.version>
     <wiremock.version>2.25.1</wiremock.version>
+    <elasticsearch.version>6.4.0</elasticsearch.version>
   </properties>
 
   <dependencyManagement>
