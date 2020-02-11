@@ -1,6 +1,5 @@
 package com.blibli.oss.backend.apiclient.configuration;
 
-import com.blibli.oss.backend.apiclient.annotation.EnableApiClient;
 import com.blibli.oss.backend.apiclient.body.FormBodyResolver;
 import com.blibli.oss.backend.apiclient.body.JsonBodyResolver;
 import com.blibli.oss.backend.apiclient.body.MultipartBodyResolver;
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties({
   ApiClientProperties.class
 })
-@EnableApiClient
 public class ApiClientConfiguration {
 
   @Bean

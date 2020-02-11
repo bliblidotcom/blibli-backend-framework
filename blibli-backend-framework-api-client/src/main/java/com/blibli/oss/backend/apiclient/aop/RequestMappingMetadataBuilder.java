@@ -2,7 +2,6 @@ package com.blibli.oss.backend.apiclient.aop;
 
 import com.blibli.oss.backend.apiclient.properties.ApiClientProperties;
 import com.blibli.oss.backend.apiclient.properties.PropertiesHelper;
-import com.google.common.reflect.TypeToken;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class RequestMappingMetadataBuilder {
 

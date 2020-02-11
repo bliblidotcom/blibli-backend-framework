@@ -1,7 +1,6 @@
 package com.blibli.oss.backend.apiclient.configuration;
 
 import com.blibli.oss.backend.apiclient.annotation.ApiClient;
-import com.blibli.oss.backend.apiclient.annotation.EnableApiClient;
 import com.blibli.oss.backend.apiclient.aop.ApiClientMethodInterceptor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 @Slf4j
+@Configuration
 public class ApiClientRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
 
   public static final String METHOD_INTERCEPTOR = "MethodInterceptor";
@@ -118,13 +119,7 @@ public class ApiClientRegistrar implements ImportBeanDefinitionRegistrar, Resour
   }
 
   protected Set<String> getBasePackages(AnnotationMetadata importingClassMetadata) {
-    Map<String, Object> attributes = importingClassMetadata.getAnnotationAttributes(EnableApiClient.class.getCanonicalName());
     Set<String> basePackages = new HashSet<>();
-    for (String pkg : (String[]) attributes.get("basePackages")) {
-      if (StringUtils.hasText(pkg)) {
-        basePackages.add(pkg);
-      }
-    }
 
     String[] packages = environment.getProperty("blibli.backend.apiclient.packages", String[].class);
     if (packages != null) {
