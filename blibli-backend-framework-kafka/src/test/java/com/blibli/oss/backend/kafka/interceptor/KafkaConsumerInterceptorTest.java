@@ -49,8 +49,8 @@ class KafkaConsumerInterceptorTest {
   @Autowired
   private HelloInterceptor helloInterceptor;
 
-  @BeforeEach
-  void setUp() {
+  @AfterEach
+  void tearDown() {
     helloInterceptor.reset();
   }
 
