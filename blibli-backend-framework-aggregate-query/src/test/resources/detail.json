@@ -1,0 +1,13 @@
+{
+  "_index": "customers",
+  "_type": "_doc",
+  "_id": "1",
+  "_version": 1,
+  "found": true,
+  "_source": {
+    "id": 1,
+    "first_name": "Eko",
+    "middle_name": "Kurniawan",
+    "last_name": "Khannedy"
+  }
+}

@@ -1,5 +1,6 @@
 package com.blibli.oss.backend.aggregate.query.apiclient;
 
+import com.blibli.oss.backend.aggregate.query.model.AggregateQueryHit;
 import com.blibli.oss.backend.aggregate.query.model.AggregateQueryResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,9 +27,8 @@ public interface AggregateQueryApiClient {
     method = RequestMethod.GET,
     produces = MediaType.APPLICATION_JSON_VALUE
   )
-  Mono<AggregateQueryResponse<Map<String, Object>>> get(@PathVariable("index") String index,
-                                                        @PathVariable("id") String id,
-                                                        @RequestBody String request);
+  Mono<AggregateQueryHit<Map<String, Object>>> get(@PathVariable("index") String index,
+                                                   @PathVariable("id") String id);
 
   @RequestMapping(
     value = "/api-native/{index}/_scroll",

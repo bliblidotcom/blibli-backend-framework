@@ -17,6 +17,9 @@ public class AggregateQueryResponse<T> {
 
   private Integer took;
 
+  @JsonProperty("_scroll_id")
+  private String scrollId;
+
   @JsonProperty("timed_out")
   private Boolean timedOut;
 
