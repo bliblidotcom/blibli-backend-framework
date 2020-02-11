@@ -78,6 +78,7 @@ public class RequestMappingMetadataBuilder {
 
   private void prepareMethods() {
     methods = Arrays.stream(ReflectionUtils.getAllDeclaredMethods(type))
+      .filter(method -> method.getAnnotation(RequestMapping.class) != null)
       .collect(Collectors.toMap(Method::toString, method -> method));
   }
 
