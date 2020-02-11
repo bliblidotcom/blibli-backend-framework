@@ -1,0 +1,41 @@
+{
+  "_scroll_id": "DnF1ZXJ5VGhlbkZldGNoBQAAAAAA",
+  "took": 104,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 2,
+    "max_score": 1.0,
+    "hits": [
+      {
+        "_index": "customers",
+        "_type": "_doc",
+        "_id": "1",
+        "_score": 1.0,
+        "_source": {
+          "id": 1,
+          "first_name": "Eko",
+          "middle_name": "Kurniawan",
+          "last_name": "Khannedy"
+        }
+      },
+      {
+        "_index": "customers",
+        "_type": "_doc",
+        "_id": "2",
+        "_score": 1.0,
+        "_source": {
+          "id": 2,
+          "first_name": "Joko",
+          "middle_name": "",
+          "last_name": "Morro"
+        }
+      }
+    ]
+  }
+}

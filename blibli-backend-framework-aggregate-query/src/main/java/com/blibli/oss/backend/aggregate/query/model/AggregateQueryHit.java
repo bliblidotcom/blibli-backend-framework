@@ -25,6 +25,11 @@ public class AggregateQueryHit<T> {
   @JsonProperty("_score")
   private Double score;
 
+  private Boolean found;
+
+  @JsonProperty("_version")
+  private Integer version;
+
   @JsonProperty("_source")
   private T source;
 
