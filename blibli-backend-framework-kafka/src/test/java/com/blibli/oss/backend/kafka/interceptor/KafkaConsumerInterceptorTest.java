@@ -49,6 +49,11 @@ class KafkaConsumerInterceptorTest {
   @Autowired
   private HelloInterceptor helloInterceptor;
 
+  @BeforeEach
+  void setUp() {
+    helloInterceptor.reset();
+  }
+
   @Test
   void testListener() throws InterruptedException {
     kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.elastic());
@@ -134,6 +139,12 @@ class KafkaConsumerInterceptorTest {
 
     @Getter
     private String afterFailed;
+
+    public void reset() {
+      beforeConsume = null;
+      afterSuccess = null;
+      afterFailed = null;
+    }
 
     @Override
     public boolean beforeConsume(ConsumerRecord<String, String> consumerRecord) {
