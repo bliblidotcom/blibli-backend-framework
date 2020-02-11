@@ -39,7 +39,6 @@
     <embedded.redis.version>0.6</embedded.redis.version>
     <wiremock.version>2.25.1</wiremock.version>
     <elasticsearch.version>6.4.0</elasticsearch.version>
-    <guava.version>28.2-jre</guava.version>
   </properties>
 
   <dependencyManagement>
@@ -50,11 +49,6 @@
         <version>${spring-cloud.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${guava.version}</version>
       </dependency>
       <dependency>
         <groupId>com.github.kstyrc</groupId>
