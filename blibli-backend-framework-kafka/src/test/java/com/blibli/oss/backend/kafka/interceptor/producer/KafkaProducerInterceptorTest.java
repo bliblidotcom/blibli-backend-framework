@@ -1,5 +1,6 @@
-package com.blibli.oss.backend.kafka.interceptor;
+package com.blibli.oss.backend.kafka.interceptor.producer;
 
+import com.blibli.oss.backend.kafka.interceptor.KafkaProducerInterceptor;
 import com.blibli.oss.backend.kafka.model.ProducerEvent;
 import com.blibli.oss.backend.kafka.producer.KafkaProducer;
 import com.blibli.oss.backend.kafka.producer.helper.KafkaHelper;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
@@ -31,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @EmbeddedKafka(
   topics = KafkaProducerInterceptorTest.TOPIC
 )
+@DirtiesContext
 class KafkaProducerInterceptorTest {
 
   public static final String TOPIC = "KafkaProducerInterceptorTest";

@@ -1,12 +1,11 @@
-package com.blibli.oss.backend.kafka.interceptor;
+package com.blibli.oss.backend.kafka.interceptor.consumer;
 
-import com.blibli.oss.backend.kafka.model.ProducerEvent;
+import com.blibli.oss.backend.kafka.interceptor.KafkaConsumerInterceptor;
 import com.blibli.oss.backend.kafka.producer.KafkaProducer;
 import com.blibli.oss.backend.kafka.producer.helper.KafkaHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.AfterEach;
@@ -21,10 +20,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
-import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,9 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @EmbeddedKafka(
   topics = KafkaConsumerInterceptorTest.TOPIC
 )
+@DirtiesContext
 class KafkaConsumerInterceptorTest {
 
-  public static final String TOPIC = "KafkaProducerInterceptorTest";
+  public static final String TOPIC = "KafkaConsumerInterceptorTest";
 
   @Autowired
   private EmbeddedKafkaBroker broker;
@@ -49,9 +48,17 @@ class KafkaConsumerInterceptorTest {
   @Autowired
   private HelloInterceptor helloInterceptor;
 
+  private Consumer<String, String> consumer;
+
+  @BeforeEach
+  void setUp() {
+    consumer = KafkaHelper.newConsumer(broker);
+    broker.consumeFromEmbeddedTopics(consumer, TOPIC);
+  }
+
   @AfterEach
   void tearDown() {
-    helloInterceptor.reset();
+    consumer.close();
   }
 
   @Test
@@ -61,10 +68,9 @@ class KafkaConsumerInterceptorTest {
 
     Assertions.assertEquals(helloListener.key, "key");
     Assertions.assertEquals(helloListener.value, "value");
-  }
 
-  @Test
-  void testInterceptor() throws InterruptedException {
+    helloInterceptor.reset();
+
     kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.elastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
@@ -92,6 +98,7 @@ class KafkaConsumerInterceptorTest {
   @SpringBootApplication
   public static class Application {
 
+
     @Bean
     public ObjectMapper objectMapper() {
       return new ObjectMapper();
@@ -117,7 +124,7 @@ class KafkaConsumerInterceptorTest {
     @Getter
     private String value;
 
-    @KafkaListener(topics = KafkaConsumerInterceptorTest.TOPIC)
+    @KafkaListener(topics = KafkaConsumerInterceptorTest.TOPIC, groupId = "custom-group")
     public void onMessage(ConsumerRecord<String, String> record) {
       if (record.key().equals("error")) {
         throw new RuntimeException("Error");
@@ -129,6 +136,7 @@ class KafkaConsumerInterceptorTest {
 
   }
 
+  @Slf4j
   public static class HelloInterceptor implements KafkaConsumerInterceptor {
 
     @Getter
@@ -148,12 +156,14 @@ class KafkaConsumerInterceptorTest {
 
     @Override
     public boolean beforeConsume(ConsumerRecord<String, String> consumerRecord) {
+      log.info("BEFORE");
       this.beforeConsume = consumerRecord.value();
       return consumerRecord.key().equals("skip");
     }
 
     @Override
     public void afterSuccessConsume(ConsumerRecord<String, String> consumerRecord) {
+      log.info("AFTER");
       this.afterSuccess = consumerRecord.value();
     }
 

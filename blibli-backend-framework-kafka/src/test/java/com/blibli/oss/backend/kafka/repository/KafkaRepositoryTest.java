@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 
@@ -31,6 +32,7 @@ import reactor.core.scheduler.Schedulers;
 @EmbeddedKafka(
   topics = KafkaRepositoryTest.TOPIC
 )
+@DirtiesContext
 public class KafkaRepositoryTest {
 
   public static final String TOPIC = "KAFKA_REPOSITORY_TEST";

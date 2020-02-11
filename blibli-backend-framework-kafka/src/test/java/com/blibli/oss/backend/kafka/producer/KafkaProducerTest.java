@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 
@@ -25,6 +26,7 @@ import reactor.core.scheduler.Schedulers;
   partitions = 1,
   topics = KafkaProducerTest.SAMPLE_TOPIC
 )
+@DirtiesContext
 class KafkaProducerTest {
 
   public static final String SAMPLE_TOPIC = "SAMPLE_TOPIC";
