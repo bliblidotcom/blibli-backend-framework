@@ -17,8 +17,11 @@ public class AggregateQueryApiClientInterceptor implements ApiClientInterceptor 
   @Override
   public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
     return Mono.just(request)
-      .doOnNext(clientRequest -> {
-        clientRequest.headers().add(AggregateQueryConstant.SERVICE_ID_HEADER, aggregateQueryProperties.getServiceId());
-      }).flatMap(next::exchange);
+      .map(clientRequest ->
+        ClientRequest
+          .from(clientRequest)
+          .header(AggregateQueryConstant.SERVICE_ID_HEADER, aggregateQueryProperties.getServiceId())
+          .build()
+      ).flatMap(next::exchange);
   }
 }

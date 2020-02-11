@@ -4,25 +4,27 @@ import com.blibli.oss.backend.aggregate.query.apiclient.AggregateQueryApiClient;
 import com.blibli.oss.backend.aggregate.query.model.AggregateQueryResponse;
 import reactor.core.publisher.Mono;
 
-public class AggregateQueryApiClientFallback<T> implements AggregateQueryApiClient<T> {
+import java.util.Map;
+
+public class AggregateQueryApiClientFallback implements AggregateQueryApiClient {
 
   @Override
-  public Mono<AggregateQueryResponse<T>> search(String index, String request) {
-    return Mono.just(AggregateQueryResponse.<T>builder().build());
+  public Mono<AggregateQueryResponse<Map<String, Object>>> search(String index, String request) {
+    return Mono.just(AggregateQueryResponse.<Map<String, Object>>builder().build());
   }
 
   @Override
-  public Mono<AggregateQueryResponse<T>> get(String index, String id, String request) {
-    return null;
+  public Mono<AggregateQueryResponse<Map<String, Object>>> get(String index, String id, String request) {
+    return Mono.just(AggregateQueryResponse.<Map<String, Object>>builder().build());
   }
 
   @Override
-  public Mono<AggregateQueryResponse<T>> scroll(String index, String request) {
-    return null;
+  public Mono<AggregateQueryResponse<Map<String, Object>>> scroll(String index, String request) {
+    return Mono.just(AggregateQueryResponse.<Map<String, Object>>builder().build());
   }
 
   @Override
-  public Mono<AggregateQueryResponse<T>> nextScroll(String index, String scrollId) {
-    return null;
+  public Mono<AggregateQueryResponse<Map<String, Object>>> nextScroll(String index, String scrollId) {
+    return Mono.just(AggregateQueryResponse.<Map<String, Object>>builder().build());
   }
 }

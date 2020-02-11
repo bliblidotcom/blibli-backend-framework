@@ -2,10 +2,9 @@ package com.blibli.oss.backend.apiclient.aop;
 
 import com.blibli.oss.backend.apiclient.properties.ApiClientProperties;
 import com.blibli.oss.backend.apiclient.properties.PropertiesHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.reflect.TypeToken;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
@@ -21,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RequestMappingMetadataBuilder {
 
@@ -79,7 +79,7 @@ public class RequestMappingMetadataBuilder {
   }
 
   private void prepareMethods() {
-    methods = Arrays.stream(ReflectionUtils.getDeclaredMethods(type))
+    methods = Arrays.stream(ReflectionUtils.getAllDeclaredMethods(type))
       .collect(Collectors.toMap(Method::toString, method -> method));
   }
 
@@ -111,7 +111,7 @@ public class RequestMappingMetadataBuilder {
     });
   }
 
-  private void prepareRequestBodyClasses() {
+  private void prepareResponseBodyClasses() {
     methods.forEach((methodName, method) -> {
       ParameterizedType parameterizedType = (ParameterizedType) method.getGenericReturnType();
       if (!parameterizedType.getRawType().getTypeName().equals(Mono.class.getName())) {
@@ -281,7 +281,7 @@ public class RequestMappingMetadataBuilder {
     prepareQueryParams();
     prepareHeaderParams();
     preparePathVariables();
-    prepareRequestBodyClasses();
+    prepareResponseBodyClasses();
     prepareRequestMethods();
     preparePaths();
     prepareCookieParams();

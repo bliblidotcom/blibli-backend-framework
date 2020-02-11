@@ -1,5 +1,6 @@
 package com.blibli.oss.backend.aggregate.query.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,14 +13,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AggregateQueryHit<T> {
 
+  @JsonProperty("_index")
   private String index;
 
-  private String doc;
+  @JsonProperty("_type")
+  private String type;
 
+  @JsonProperty("_id")
   private String id;
 
+  @JsonProperty("_score")
   private Double score;
 
+  @JsonProperty("_source")
   private T source;
 
   public <R> R sourceAs(ObjectMapper objectMapper, Class<R> tClass) {

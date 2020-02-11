@@ -1,5 +1,6 @@
 package com.blibli.oss.backend.aggregate.query.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ public class AggregateQueryResponse<T> {
 
   private Integer took;
 
+  @JsonProperty("timed_out")
   private Boolean timedOut;
 
   private AggregateQueryHits<T> hits;

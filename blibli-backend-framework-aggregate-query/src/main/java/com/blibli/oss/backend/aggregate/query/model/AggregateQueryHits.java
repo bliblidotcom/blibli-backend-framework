@@ -1,5 +1,6 @@
 package com.blibli.oss.backend.aggregate.query.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,9 +18,16 @@ public class AggregateQueryHits<T> {
 
   private Long total;
 
+  @JsonProperty("max_score")
   private Double maxScore;
 
   private List<AggregateQueryHit<T>> hits;
+
+  public List<T> hitsOnly() {
+    return hits.stream().
+      map(AggregateQueryHit::getSource).
+      collect(Collectors.toList());
+  }
 
   public <R> List<R> hitsAs(ObjectMapper objectMapper, Class<R> tClass) {
     return hits.stream()
