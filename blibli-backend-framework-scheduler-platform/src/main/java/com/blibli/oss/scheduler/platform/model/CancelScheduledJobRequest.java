@@ -8,15 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@KafkaTopic(SchedulerPlatformTopics.SAVE_DELAYED_JOB_EVENT)
-public class DelayedJobRequest implements SchedulerPlatformModel {
+@KafkaTopic(SchedulerPlatformTopics.CANCEL_SCHEDULED_JOB_EVENT)
+public class CancelScheduledJobRequest implements SchedulerPlatformModel {
 
   @KafkaKey
   private String id;
@@ -24,11 +21,4 @@ public class DelayedJobRequest implements SchedulerPlatformModel {
   private String name;
 
   private String group;
-
-  private String payload;
-
-  private String topic;
-
-  @Builder.Default
-  private List<Long> notifyTimes = new ArrayList<>();
 }
