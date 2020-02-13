@@ -11,7 +11,6 @@
     <module>blibli-backend-framework-swagger</module>
     <module>blibli-backend-framework-mandatory-parameter</module>
     <module>blibli-backend-framework-kafka</module>
-    <module>blibli-backend-framework-sleuth</module>
     <module>blibli-backend-framework-api-client</module>
     <module>blibli-backend-framework-aggregate-query</module>
     <module>blibli-backend-framework-scheduler-platform</module>
@@ -94,11 +93,6 @@
       <dependency>
         <groupId>com.blibli.oss</groupId>
         <artifactId>blibli-backend-framework-scheduler-platform</artifactId>
-        <version>${blibli-framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.blibli.oss</groupId>
-        <artifactId>blibli-backend-framework-sleuth</artifactId>
         <version>${blibli-framework.version}</version>
       </dependency>
       <dependency>
