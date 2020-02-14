@@ -97,12 +97,21 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
       .baseUrl(metadata.getProperties().getUrl())
       .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
       .defaultHeaders(httpHeaders -> metadata.getProperties().getHeaders().forEach(httpHeaders::add))
-      .filters(exchangeFilterFunctions ->
-        metadata.getProperties().getInterceptors().forEach(interceptorClass ->
-          exchangeFilterFunctions.add((ApiClientInterceptor) applicationContext.getBean(interceptorClass))
-        )
-      )
+      .filters(exchangeFilterFunctions -> exchangeFilterFunctions.addAll(getApiClientInterceptors()))
       .build();
+  }
+
+  private Set<ApiClientInterceptor> getApiClientInterceptors() {
+    Set<ApiClientInterceptor> interceptors = new HashSet<>();
+    metadata.getProperties().getInterceptors().forEach(interceptorClass ->
+      interceptors.add((ApiClientInterceptor) applicationContext.getBean(interceptorClass))
+    );
+
+    ApiClient annotation = type.getAnnotation(ApiClient.class);
+    for (Class<? extends ApiClientInterceptor> interceptor : annotation.interceptors()) {
+      interceptors.add(applicationContext.getBean(interceptor));
+    }
+    return interceptors;
   }
 
   private void prepareFallback() {
@@ -208,7 +217,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     Type type = metadata.getResponseBodyClasses().get(methodName);
     if (type instanceof ParameterizedType) {
       return client.retrieve()
-          .bodyToMono(ParameterizedTypeReference.forType(type));
+        .bodyToMono(ParameterizedTypeReference.forType(type));
     }
 
     return client.retrieve().bodyToMono((Class) type);
