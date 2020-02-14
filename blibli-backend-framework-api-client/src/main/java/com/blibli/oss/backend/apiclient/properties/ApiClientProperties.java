@@ -23,7 +23,7 @@ public class ApiClientProperties {
 
   private Map<String, ApiClientConfigProperties> configs = new HashMap<>();
 
-  private List<String> packages = new ArrayList<>();
+  private String packages;
 
   @Data
   @AllArgsConstructor

@@ -1,7 +1,10 @@
 package com.blibli.oss.backend.aggregate.query.apiclient;
 
+import com.blibli.oss.backend.aggregate.query.fallback.AggregateQueryApiClientFallback;
+import com.blibli.oss.backend.aggregate.query.interceptor.AggregateQueryApiClientInterceptor;
 import com.blibli.oss.backend.aggregate.query.model.AggregateQueryHit;
 import com.blibli.oss.backend.aggregate.query.model.AggregateQueryResponse;
+import com.blibli.oss.backend.apiclient.annotation.ApiClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +14,16 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
+@ApiClient(
+  name = AggregateQueryApiClient.NAME,
+  fallback = AggregateQueryApiClientFallback.class,
+  interceptors = {
+    AggregateQueryApiClientInterceptor.class
+  }
+)
 public interface AggregateQueryApiClient {
+
+  String NAME = "aggregateQueryApiClient";
 
   @RequestMapping(
     value = "/api-native/{index}/_search",

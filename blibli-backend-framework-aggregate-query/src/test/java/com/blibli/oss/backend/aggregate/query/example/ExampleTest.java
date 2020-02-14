@@ -1,5 +1,6 @@
 package com.blibli.oss.backend.aggregate.query.example;
 
+import com.blibli.oss.backend.aggregate.query.apiclient.AggregateQueryApiClient;
 import com.blibli.oss.backend.aggregate.query.constant.AggregateQueryConstant;
 import com.blibli.oss.backend.aggregate.query.model.AggregateQueryResponse;
 import com.blibli.oss.backend.aggregate.query.properties.AggregateQueryProperties;
@@ -33,7 +34,7 @@ public class ExampleTest {
   private static WireMockServer wireMockServer;
 
   @Autowired
-  private ExampleAggregateQueryApiClient exampleAggregateQueryApiClient;
+  private AggregateQueryApiClient aggregateQueryApiClient;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -68,7 +69,7 @@ public class ExampleTest {
         )
     );
 
-    Mono<ExampleResponse> response = exampleAggregateQueryApiClient.get("index", "1")
+    Mono<ExampleResponse> response = aggregateQueryApiClient.get("index", "1")
       .map(value -> value.sourceAs(objectMapper, ExampleResponse.class));
 
     StepVerifier.create(response)
@@ -98,7 +99,7 @@ public class ExampleTest {
         )
     );
 
-    Flux<ExampleResponse> response = exampleAggregateQueryApiClient.search("index", request)
+    Flux<ExampleResponse> response = aggregateQueryApiClient.search("index", request)
       .map(value -> value.getHits().hitsAs(objectMapper, ExampleResponse.class))
       .flatMapMany(Flux::fromIterable);
 
@@ -130,7 +131,7 @@ public class ExampleTest {
         )
     );
 
-    Flux<ExampleResponse> response = exampleAggregateQueryApiClient.scroll("index", request)
+    Flux<ExampleResponse> response = aggregateQueryApiClient.scroll("index", request)
       .map(value -> value.getHits().hitsAs(objectMapper, ExampleResponse.class))
       .flatMapMany(Flux::fromIterable);
 
@@ -173,9 +174,9 @@ public class ExampleTest {
         )
     );
 
-    Flux<ExampleResponse> response = exampleAggregateQueryApiClient.scroll("index", request)
+    Flux<ExampleResponse> response = aggregateQueryApiClient.scroll("index", request)
       .map(AggregateQueryResponse::getScrollId)
-      .flatMap(value -> exampleAggregateQueryApiClient.nextScroll("index", value))
+      .flatMap(value -> aggregateQueryApiClient.nextScroll("index", value))
       .map(value -> value.getHits().hitsAs(objectMapper, ExampleResponse.class))
       .flatMapMany(Flux::fromIterable);
 
