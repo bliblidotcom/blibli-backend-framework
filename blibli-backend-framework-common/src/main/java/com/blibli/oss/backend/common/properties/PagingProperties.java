@@ -1,5 +1,6 @@
 package com.blibli.oss.backend.common.properties;
 
+import com.blibli.oss.backend.common.model.request.SortByDirection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class PagingProperties {
 
   private Integer defaultItemPerPage = 50;
 
-  private String defaultSortDirection = "asc";
+  private SortByDirection defaultSortDirection = SortByDirection.ASC;
 
   private Integer maxItemPerPage = Integer.MAX_VALUE;
 

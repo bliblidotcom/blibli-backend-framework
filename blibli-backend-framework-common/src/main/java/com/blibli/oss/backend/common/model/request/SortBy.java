@@ -16,5 +16,5 @@ public class SortBy {
   private String propertyName;
 
   @JsonProperty("direction")
-  private String direction;
+  private SortByDirection direction;
 }

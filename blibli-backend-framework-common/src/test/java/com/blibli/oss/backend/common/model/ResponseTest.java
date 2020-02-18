@@ -2,6 +2,7 @@ package com.blibli.oss.backend.common.model;
 
 import com.blibli.oss.backend.common.helper.ResponseHelper;
 import com.blibli.oss.backend.common.model.request.SortBy;
+import com.blibli.oss.backend.common.model.request.SortByDirection;
 import com.blibli.oss.backend.common.model.response.Paging;
 import com.blibli.oss.backend.common.model.response.Response;
 import lombok.AllArgsConstructor;
@@ -51,7 +52,7 @@ public class ResponseTest {
       .jsonPath("paging.total_item").isEqualTo(30)
       .jsonPath("paging.total_page").isEqualTo(10)
       .jsonPath("paging.sort_by[0].property_name").isEqualTo("first_name")
-      .jsonPath("paging.sort_by[0].direction").isEqualTo("asc");
+      .jsonPath("paging.sort_by[0].direction").isEqualTo("ASC");
   }
 
   @Test
@@ -134,7 +135,7 @@ public class ResponseTest {
             .sortBy(Arrays.asList(
               SortBy.builder()
                 .propertyName("first_name")
-                .direction("asc")
+                .direction(SortByDirection.ASC)
                 .build()
             ))
             .build()

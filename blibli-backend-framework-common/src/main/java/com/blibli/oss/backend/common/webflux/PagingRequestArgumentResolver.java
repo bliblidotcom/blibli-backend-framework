@@ -2,6 +2,7 @@ package com.blibli.oss.backend.common.webflux;
 
 import com.blibli.oss.backend.common.model.request.PagingRequest;
 import com.blibli.oss.backend.common.model.request.SortBy;
+import com.blibli.oss.backend.common.model.request.SortByDirection;
 import com.blibli.oss.backend.common.properties.PagingProperties;
 import lombok.AllArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -95,7 +96,7 @@ public class PagingRequestArgumentResolver implements HandlerMethodArgumentResol
 
     return new SortBy(
       getAt(sortBy, 0, null),
-      getAt(sortBy, 1, pagingProperties.getDefaultSortDirection())
+      SortByDirection.valueOf(getAt(sortBy, 1, pagingProperties.getDefaultSortDirection().name()))
     );
   }
 
