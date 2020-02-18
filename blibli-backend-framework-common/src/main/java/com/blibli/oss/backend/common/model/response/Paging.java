@@ -16,16 +16,16 @@ import java.util.List;
 public class Paging {
 
   @JsonProperty("page")
-  private Integer page;
+  private Long page;
 
   @JsonProperty("total_page")
-  private Integer totalPage;
+  private Long totalPage;
 
   @JsonProperty("item_per_page")
-  private Integer itemPerPage;
+  private Long itemPerPage;
 
   @JsonProperty("total_item")
-  private Integer totalItem;
+  private Long totalItem;
 
   @JsonProperty("sort_by")
   private List<SortBy> sortBy;

@@ -15,10 +15,10 @@ import java.util.List;
 public class PagingRequest {
 
   @JsonProperty("page")
-  private Integer page;
+  private Long page;
 
   @JsonProperty("item_per_page")
-  private Integer itemPerPage;
+  private Long itemPerPage;
 
   @JsonProperty("sort_by")
   private List<SortBy> sortBy;

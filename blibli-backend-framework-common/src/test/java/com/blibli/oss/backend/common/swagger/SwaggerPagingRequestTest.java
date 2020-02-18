@@ -56,7 +56,7 @@ public class SwaggerPagingRequestTest {
       @GetMapping(value = "/paging", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Paging> paging(PagingRequest pagingRequest) {
         return Mono.just(
-          PagingHelper.toPaging(pagingRequest, 100, 100 * pagingRequest.getItemPerPage())
+          PagingHelper.toPaging(pagingRequest, 100L, 100 * pagingRequest.getItemPerPage())
         );
       }
 

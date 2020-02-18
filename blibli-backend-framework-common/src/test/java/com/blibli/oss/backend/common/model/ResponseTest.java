@@ -128,10 +128,10 @@ public class ResponseTest {
         return Mono.just(ResponseHelper.ok(
           Arrays.asList("Eko", "Kurniawan", "Khannedy"),
           Paging.builder()
-            .page(1)
-            .itemPerPage(3)
-            .totalItem(30)
-            .totalPage(10)
+            .page(1L)
+            .itemPerPage(3L)
+            .totalItem(30L)
+            .totalPage(10L)
             .sortBy(Arrays.asList(
               SortBy.builder()
                 .propertyName("first_name")

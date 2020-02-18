@@ -14,13 +14,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("blibli.backend.common.paging")
 public class PagingProperties {
 
-  private Integer defaultPage = 1;
+  private Long defaultPage = 1L;
 
-  private Integer defaultItemPerPage = 50;
+  private Long defaultItemPerPage = 50L;
 
   private SortByDirection defaultSortDirection = SortByDirection.ASC;
 
-  private Integer maxItemPerPage = Integer.MAX_VALUE;
+  private Long maxItemPerPage = 1000L;
 
   private Query query = new Query();
 

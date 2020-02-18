@@ -42,11 +42,11 @@ public class PagingRequestArgumentResolver implements HandlerMethodArgumentResol
   private PagingRequest fromServerHttpRequest(ServerHttpRequest request) {
     PagingRequest paging = new PagingRequest();
 
-    paging.setPage(getInteger(
+    paging.setPage(getLong(
       request.getQueryParams().getFirst(pagingProperties.getQuery().getPageKey()),
       pagingProperties.getDefaultPage()
     ));
-    paging.setItemPerPage(getInteger(
+    paging.setItemPerPage(getLong(
       request.getQueryParams().getFirst(pagingProperties.getQuery().getItemPerPageKey()),
       pagingProperties.getDefaultItemPerPage()
     ));
@@ -70,11 +70,11 @@ public class PagingRequestArgumentResolver implements HandlerMethodArgumentResol
     }
   }
 
-  private Integer getInteger(String value, Integer defaultValue) {
+  private Long getLong(String value, Long defaultValue) {
     if (value == null) {
       return defaultValue;
     } else {
-      return toInt(value, defaultValue);
+      return toLong(value, defaultValue);
     }
   }
 
@@ -105,9 +105,9 @@ public class PagingRequestArgumentResolver implements HandlerMethodArgumentResol
     return strings.length <= index ? defaultValue : strings[index];
   }
 
-  public Integer toInt(String value, Integer defaultValue) {
+  public Long toLong(String value, Long defaultValue) {
     try {
-      return Integer.valueOf(value);
+      return Long.valueOf(value);
     } catch (NumberFormatException ex) {
       return defaultValue;
     }
