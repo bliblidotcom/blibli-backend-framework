@@ -5,6 +5,7 @@ import com.blibli.oss.backend.common.model.request.SortBy;
 import com.blibli.oss.backend.common.model.request.SortByDirection;
 import com.blibli.oss.backend.common.properties.PagingProperties;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StringUtils;
@@ -96,7 +97,7 @@ public class PagingRequestArgumentResolver implements HandlerMethodArgumentResol
 
     return new SortBy(
       getAt(sortBy, 0, null),
-      SortByDirection.valueOf(getAt(sortBy, 1, pagingProperties.getDefaultSortDirection().name()))
+      EnumUtils.getEnum(SortByDirection.class, getAt(sortBy, 1, pagingProperties.getDefaultSortDirection().name()).toUpperCase())
     );
   }
 

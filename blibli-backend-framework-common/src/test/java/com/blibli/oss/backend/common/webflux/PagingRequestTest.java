@@ -36,7 +36,7 @@ public class PagingRequestTest {
         .path("/paging-request")
         .queryParam(pagingProperties.getQuery().getPageKey(), 1)
         .queryParam(pagingProperties.getQuery().getItemPerPageKey(), 100)
-        .queryParam(pagingProperties.getQuery().getSortByKey(), "first_name:asc,last_name:desc")
+        .queryParam(pagingProperties.getQuery().getSortByKey(), "first_name:ASC,last_name:DESC")
         .build()
       )
       .exchange()
@@ -44,9 +44,9 @@ public class PagingRequestTest {
       .jsonPath("$.page").isEqualTo(1)
       .jsonPath("$.item_per_page").isEqualTo(100)
       .jsonPath("$.sort_by[0].property_name").isEqualTo("first_name")
-      .jsonPath("$.sort_by[0].direction").isEqualTo("asc")
+      .jsonPath("$.sort_by[0].direction").isEqualTo("ASC")
       .jsonPath("$.sort_by[1].property_name").isEqualTo("last_name")
-      .jsonPath("$.sort_by[1].direction").isEqualTo("desc");
+      .jsonPath("$.sort_by[1].direction").isEqualTo("DESC");
   }
 
   @Test
@@ -70,7 +70,7 @@ public class PagingRequestTest {
         .path("/paging")
         .queryParam(pagingProperties.getQuery().getPageKey(), 1)
         .queryParam(pagingProperties.getQuery().getItemPerPageKey(), 100)
-        .queryParam(pagingProperties.getQuery().getSortByKey(), "first_name:asc,last_name:desc")
+        .queryParam(pagingProperties.getQuery().getSortByKey(), "first_name:ASC,last_name:DESC")
         .build()
       )
       .exchange()
@@ -80,9 +80,9 @@ public class PagingRequestTest {
       .jsonPath("$.total_page").isEqualTo(100)
       .jsonPath("$.total_item").isEqualTo(100 * 100)
       .jsonPath("$.sort_by[0].property_name").isEqualTo("first_name")
-      .jsonPath("$.sort_by[0].direction").isEqualTo("asc")
+      .jsonPath("$.sort_by[0].direction").isEqualTo("ASC")
       .jsonPath("$.sort_by[1].property_name").isEqualTo("last_name")
-      .jsonPath("$.sort_by[1].direction").isEqualTo("desc");
+      .jsonPath("$.sort_by[1].direction").isEqualTo("DESC");
   }
 
   @Test
