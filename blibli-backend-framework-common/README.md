@@ -61,6 +61,34 @@ public class CustomerController {
 }
 ```
 
-## Standard Paging and Sorting Request 
+## Standard Paging Request and Response 
+
+For Paging, we can use `PagingRequest` class for web request, and `Paging` class for web response. 
+We also already implement `PagingRequestArgumentResolver` to support argument injection on controller,
+so we don't need to parse paging request manually.
+
+```java
+@RestController
+public class CustomerController {
+  
+  @GetMapping(
+    value = "/api/customers",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Mono<Response<List<Customer>>> list(MandatoryParameter mandatoryParameter,
+                                                           PagingRequest pagingRequest) {
+    return customerService.find(mandatoryParameter, pagingRequest)
+      .map(response -> {
+        Paging paging = PagingHelper.toPaging(pagingRequest, response.getTotal());
+        return ResponseHelper.ok(response.getCustomers(), paging);
+      })
+      .subscribeOn(commandScheduler);
+  }
+
+
+}
+``` 
 
 ## Default Error Handler
+
+## Swagger Support

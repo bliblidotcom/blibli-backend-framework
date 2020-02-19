@@ -2,6 +2,26 @@
 
 Blibli Backend Framework is various spring boot 2 libraries for Blibli.com backend projects.
 
+## Setup
+
+To use blibli backend framework, we need to setup our pom.xml
+
+```xml
+<!-- Set parent project -->
+<parent>
+    <groupId>com.blibli.oss</groupId>
+    <artifactId>blibli-backend-framework</artifactId>
+    <version>...</version>
+    <relativePath/> <!-- lookup parent from repository -->
+</parent>
+
+<properties>
+    <!-- Set blibli framework version -->
+    <blibli-framework.version>...</blibli-framework.version>
+</properties>
+
+```
+
 ## List of Libraries 
 
 - [Common](blibli-backend-framework-common/README.md) : standard request and response
