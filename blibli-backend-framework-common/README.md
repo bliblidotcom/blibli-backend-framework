@@ -75,9 +75,8 @@ public class CustomerController {
     value = "/api/customers",
     produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public Mono<Response<List<Customer>>> list(MandatoryParameter mandatoryParameter,
-                                                           PagingRequest pagingRequest) {
-    return customerService.find(mandatoryParameter, pagingRequest)
+  public Mono<Response<List<Customer>>> list(PagingRequest pagingRequest) {
+    return customerService.find(pagingRequest)
       .map(response -> {
         Paging paging = PagingHelper.toPaging(pagingRequest, response.getTotal());
         return ResponseHelper.ok(response.getCustomers(), paging);
@@ -89,6 +88,78 @@ public class CustomerController {
 }
 ``` 
 
+In the url we can use standard paging :
+
+```
+GET /api/customers?page=1&item_per_page=100
+
+GET /api/customers?page=2&item_per_page=50
+
+GET /api/customers?page=2
+```
+
+We can also configure default paging properties :
+
+```properties
+blibli.backend.common.paging.default-page=1
+blibli.backend.common.paging.default-item-per-page=50
+blibli.backend.common.paging.max-item-per-page=1000
+```
+
+## Standard Sorting Request
+
+In the `PagingRequest` we also can give sorting information, and it will automatically injected to `PagingRequest`.
+
+```
+GET /api/customers?page=2&sort_by=id:asc,first_name:asc,created_at:desc
+
+GET /api/customers?page=2&sort_by=id,first_name,created_at:desc
+```
+
+We can also configured default sorting properties
+
+```properties
+blibli.backend.common.paging.default-sort-direction=asc
+```
+
 ## Default Error Handler
 
+Common module also contain default error handler to create standard error response. 
+We can use `CommonErrorController` class to create standard error controller.
+
+```java
+@Slf4j
+@RestControllerAdvice
+public class ErrorController implements CommonErrorController, MessageSourceAware {
+
+  @Getter
+  @Setter
+  private MessageSource messageSource;
+
+  @Override
+  public Logger getLogger() {
+    return log;
+  }
+}
+``` 
+
 ## Swagger Support
+
+If we include Swagger Module, we can also make Paging & Sorting feature to be included on Swagger OpenAPI Spec. 
+We only need to add annotation `@PagingRequestInQuery`
+
+```java
+@RestController
+public class CustomerController {
+  
+  @PagingRequestInQuery
+  @GetMapping(
+    value = "/api/customers",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Mono<Response<List<Customer>>> list(PagingRequest pagingRequest) {
+    // some logic
+  }
+
+}
+```
