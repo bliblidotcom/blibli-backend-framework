@@ -1,12 +1,12 @@
 package com.blibli.oss.backend.mandatoryparameter;
 
-import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterSwaggerProperties;
+import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({
-  MandatoryParameterSwaggerProperties.class
+  MandatoryParameterProperties.class
 })
 public class MandatoryParameterAutoConfiguration {
 

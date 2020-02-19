@@ -1,7 +1,7 @@
 package com.blibli.oss.backend.mandatoryparameter.webflux;
 
 import com.blibli.oss.backend.mandatoryparameter.MandatoryParameterAutoConfiguration;
-import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterSwaggerProperties;
+import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -17,7 +17,7 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 @AutoConfigureAfter(MandatoryParameterAutoConfiguration.class)
 public class MandatoryParameterWebFluxAutoConfiguration implements WebFluxConfigurer {
 
-  private final MandatoryParameterSwaggerProperties properties;
+  private final MandatoryParameterProperties properties;
 
   @Override
   public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {

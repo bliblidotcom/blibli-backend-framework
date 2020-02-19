@@ -2,7 +2,7 @@ package com.blibli.oss.backend.mandatoryparameter.swagger;
 
 import com.blibli.oss.backend.mandatoryparameter.MandatoryParameterAutoConfiguration;
 import com.blibli.oss.backend.mandatoryparameter.swagger.bean.MandatoryParameterSwaggerIgnoredParameter;
-import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterSwaggerProperties;
+import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import com.blibli.oss.backend.swagger.SwaggerAutoConfiguration;
 import com.blibli.oss.backend.swagger.api.SwaggerIgnoredParameter;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
@@ -24,7 +24,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter queryParameterStoreId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter queryParameterStoreId(MandatoryParameterProperties properties) {
     return new QueryParameter()
       .required(true)
       .name(properties.getQueryKey().getStoreId())
@@ -32,7 +32,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter queryParameterChannelId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter queryParameterChannelId(MandatoryParameterProperties properties) {
     return new QueryParameter()
       .required(true)
       .name(properties.getQueryKey().getChannelId())
@@ -40,7 +40,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter queryParameterClientId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter queryParameterClientId(MandatoryParameterProperties properties) {
     return new QueryParameter()
       .required(true)
       .name(properties.getQueryKey().getClientId())
@@ -48,7 +48,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter queryParameterUsername(MandatoryParameterSwaggerProperties properties) {
+  public Parameter queryParameterUsername(MandatoryParameterProperties properties) {
     return new QueryParameter()
       .required(true)
       .name(properties.getQueryKey().getUsername())
@@ -56,7 +56,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter queryParameterRequestId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter queryParameterRequestId(MandatoryParameterProperties properties) {
     return new QueryParameter()
       .required(true)
       .name(properties.getQueryKey().getRequestId())
@@ -64,7 +64,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter headerParameterStoreId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter headerParameterStoreId(MandatoryParameterProperties properties) {
     return new HeaderParameter()
       .required(true)
       .name(properties.getHeaderKey().getStoreId())
@@ -72,7 +72,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter headerParameterChannelId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter headerParameterChannelId(MandatoryParameterProperties properties) {
     return new HeaderParameter()
       .required(true)
       .name(properties.getHeaderKey().getChannelId())
@@ -80,7 +80,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter headerParameterClientId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter headerParameterClientId(MandatoryParameterProperties properties) {
     return new HeaderParameter()
       .required(true)
       .name(properties.getHeaderKey().getClientId())
@@ -88,7 +88,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter headerParameterUsername(MandatoryParameterSwaggerProperties properties) {
+  public Parameter headerParameterUsername(MandatoryParameterProperties properties) {
     return new HeaderParameter()
       .required(true)
       .name(properties.getHeaderKey().getUsername())
@@ -96,7 +96,7 @@ public class MandatoryParameterSwaggerAutoConfiguration {
   }
 
   @Bean
-  public Parameter headerParameterRequestId(MandatoryParameterSwaggerProperties properties) {
+  public Parameter headerParameterRequestId(MandatoryParameterProperties properties) {
     return new HeaderParameter()
       .required(true)
       .name(properties.getHeaderKey().getRequestId())

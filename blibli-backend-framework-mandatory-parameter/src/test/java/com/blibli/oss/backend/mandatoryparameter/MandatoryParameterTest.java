@@ -3,7 +3,7 @@ package com.blibli.oss.backend.mandatoryparameter;
 import com.blibli.oss.backend.mandatoryparameter.model.MandatoryParameter;
 import com.blibli.oss.backend.mandatoryparameter.swagger.annotation.MandatoryParameterAtHeader;
 import com.blibli.oss.backend.mandatoryparameter.swagger.annotation.MandatoryParameterAtQuery;
-import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterSwaggerProperties;
+import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +27,7 @@ public class MandatoryParameterTest {
   private WebTestClient webTestClient;
 
   @Autowired
-  private MandatoryParameterSwaggerProperties properties;
+  private MandatoryParameterProperties properties;
 
   @Test
   void testMandatoryParameterUsingQuery() {

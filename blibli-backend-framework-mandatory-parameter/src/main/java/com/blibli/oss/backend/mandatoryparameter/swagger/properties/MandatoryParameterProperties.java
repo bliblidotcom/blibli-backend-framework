@@ -10,8 +10,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ConfigurationProperties("blibli.backend.mandatoryparameter.swagger")
-public class MandatoryParameterSwaggerProperties {
+@ConfigurationProperties("blibli.backend.mandatoryparameter")
+public class MandatoryParameterProperties {
 
   private QueryKey queryKey = new QueryKey();
 
