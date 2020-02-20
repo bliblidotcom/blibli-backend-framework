@@ -6,6 +6,15 @@ Common module is standard request and response format for Web. Currently Common 
 - Standard paging and sorting request
 - Default error handler
 
+## Setup Dependency
+
+```xml
+<dependency>
+  <groupId>com.blibli.oss</groupId>
+  <artifactId>blibli-backend-framework-common</artifactId>
+</dependency>
+```
+
 ## Standard Web Response
 
 Blibli backend response will always use class `Response<T>`. 
