@@ -2,6 +2,15 @@
 
 Reactor module is helper for Project Reactor. Project Reactor is reactive programming library used by Spring Web Flux.
 
+## Setup Dependency
+
+```xml
+<dependency>
+  <groupId>com.blibli.oss</groupId>
+  <artifactId>blibli-backend-framework-reactor</artifactId>
+</dependency>
+```
+
 ## Scheduler Helper
 
 Reactor module can help to setup scheduler using configuration. And we can use `SchedulerHelper` class to get the object.
