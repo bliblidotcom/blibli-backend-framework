@@ -1,5 +1,8 @@
 package com.blibli.oss.backend.apiclient.properties;
 
+import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
+import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
+import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,7 +46,11 @@ public class ApiClientProperties {
 
     private Map<String, String> headers = new HashMap<>();
 
-    private List<Class<?>> interceptors = new ArrayList<>();
+    private List<Class<? extends ApiClientInterceptor>> interceptors = new ArrayList<>();
+
+    private List<Class<? extends ApiClientWebClientCustomizer>> webClientCustomizers = new ArrayList<>();
+
+    private List<Class<? extends ApiClientCodecCustomizer>> codecCustomizers = new ArrayList<>();
 
   }
 

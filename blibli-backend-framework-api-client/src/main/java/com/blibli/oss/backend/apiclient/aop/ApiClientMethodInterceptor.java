@@ -2,6 +2,8 @@ package com.blibli.oss.backend.apiclient.aop;
 
 import com.blibli.oss.backend.apiclient.annotation.ApiClient;
 import com.blibli.oss.backend.apiclient.body.ApiBodyResolver;
+import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
+import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
 import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
@@ -12,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.ParameterizedTypeReference;
@@ -54,9 +55,6 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   @Setter
   private AnnotationMetadata annotationMetadata;
 
-  @Autowired
-  private ObjectMapper objectMapper;
-
   private List<ApiBodyResolver> bodyResolvers;
 
   private WebClient webClient;
@@ -78,33 +76,70 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   private void prepareWebClient() {
-    ObjectMapper objectMapper = applicationContext.getBean(ObjectMapper.class);
+    WebClient.Builder builder = WebClient.builder()
+      .exchangeStrategies(getExchangeStrategies())
+      .baseUrl(metadata.getProperties().getUrl())
+      .clientConnector(new ReactorClientHttpConnector(HttpClient.from(getTcpClient())))
+      .defaultHeaders(httpHeaders -> metadata.getProperties().getHeaders().forEach(httpHeaders::add))
+      .filters(exchangeFilterFunctions -> exchangeFilterFunctions.addAll(getApiClientInterceptors()));
 
-    ExchangeStrategies strategies = ExchangeStrategies.builder().codecs(clientDefaultCodecsConfigurer -> {
-      clientDefaultCodecsConfigurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON));
-      clientDefaultCodecsConfigurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper, MediaType.APPLICATION_JSON));
-    }).build();
+    for (ApiClientWebClientCustomizer apiClientWebClientCustomizer : getApiClientWebClientCustomizers()) {
+      apiClientWebClientCustomizer.customize(builder);
+    }
 
-    TcpClient tcpClient = TcpClient.create()
+    webClient = builder.build();
+  }
+
+  private TcpClient getTcpClient() {
+    return TcpClient.create()
       .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) metadata.getProperties().getConnectTimeout().toMillis())
       .doOnConnected(connection -> connection
         .addHandlerLast(new ReadTimeoutHandler(metadata.getProperties().getReadTimeout().toMillis(), TimeUnit.MILLISECONDS))
         .addHandlerLast(new WriteTimeoutHandler(metadata.getProperties().getWriteTimeout().toMillis(), TimeUnit.MILLISECONDS))
       );
+  }
 
-    webClient = WebClient.builder()
-      .exchangeStrategies(strategies)
-      .baseUrl(metadata.getProperties().getUrl())
-      .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
-      .defaultHeaders(httpHeaders -> metadata.getProperties().getHeaders().forEach(httpHeaders::add))
-      .filters(exchangeFilterFunctions -> exchangeFilterFunctions.addAll(getApiClientInterceptors()))
-      .build();
+  private ExchangeStrategies getExchangeStrategies() {
+    ObjectMapper objectMapper = applicationContext.getBean(ObjectMapper.class);
+    return ExchangeStrategies.builder().codecs(clientDefaultCodecsConfigurer -> {
+      clientDefaultCodecsConfigurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON));
+      clientDefaultCodecsConfigurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper, MediaType.APPLICATION_JSON));
+      for (ApiClientCodecCustomizer apiClientCodecCustomizer : getApiClientCodecCustomizers()) {
+        apiClientCodecCustomizer.customize(clientDefaultCodecsConfigurer);
+      }
+    }).build();
+  }
+
+  private Set<ApiClientCodecCustomizer> getApiClientCodecCustomizers() {
+    Set<ApiClientCodecCustomizer> apiClientCodecCustomizers = new HashSet<>();
+    metadata.getProperties().getCodecCustomizers().forEach(interceptorClass ->
+      apiClientCodecCustomizers.add(applicationContext.getBean(interceptorClass))
+    );
+
+    ApiClient annotation = type.getAnnotation(ApiClient.class);
+    for (Class<? extends ApiClientCodecCustomizer> interceptor : annotation.codecCustomizers()) {
+      apiClientCodecCustomizers.add(applicationContext.getBean(interceptor));
+    }
+    return apiClientCodecCustomizers;
+  }
+
+  private Set<ApiClientWebClientCustomizer> getApiClientWebClientCustomizers() {
+    Set<ApiClientWebClientCustomizer> apiClientWebClientCustomizers = new HashSet<>();
+    metadata.getProperties().getWebClientCustomizers().forEach(interceptorClass ->
+      apiClientWebClientCustomizers.add(applicationContext.getBean(interceptorClass))
+    );
+
+    ApiClient annotation = type.getAnnotation(ApiClient.class);
+    for (Class<? extends ApiClientWebClientCustomizer> interceptor : annotation.webClientCustomizers()) {
+      apiClientWebClientCustomizers.add(applicationContext.getBean(interceptor));
+    }
+    return apiClientWebClientCustomizers;
   }
 
   private Set<ApiClientInterceptor> getApiClientInterceptors() {
     Set<ApiClientInterceptor> interceptors = new HashSet<>();
     metadata.getProperties().getInterceptors().forEach(interceptorClass ->
-      interceptors.add((ApiClientInterceptor) applicationContext.getBean(interceptorClass))
+      interceptors.add(applicationContext.getBean(interceptorClass))
     );
 
     ApiClient annotation = type.getAnnotation(ApiClient.class);
@@ -126,6 +161,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Object invoke(MethodInvocation invocation) throws Throwable {
     Method method = invocation.getMethod();
     String methodName = method.toString();
