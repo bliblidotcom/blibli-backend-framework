@@ -1,6 +1,7 @@
 package com.blibli.oss.backend.swagger;
 
 import com.blibli.oss.backend.swagger.api.SwaggerIgnoredParameter;
+import com.blibli.oss.backend.swagger.api.SwaggerIgnoredParameterAnnotation;
 import com.blibli.oss.backend.swagger.factory.ComponentsFactoryBean;
 import com.blibli.oss.backend.swagger.factory.IgnoredParameterAnnotationsFactoryBean;
 import com.blibli.oss.backend.swagger.factory.OpenAPIFactoryBean;
@@ -40,6 +41,11 @@ public class SwaggerAutoConfiguration {
     openAPIFactoryBean.setComponents(components);
     openAPIFactoryBean.setSwaggerProperties(swaggerProperties);
     return openAPIFactoryBean;
+  }
+
+  @Bean
+  public SwaggerIgnoredParameterAnnotation swaggerIgnoredParameterAnnotation() {
+    return new SwaggerIgnoredParameterAnnotation();
   }
 
   @Bean
