@@ -4,6 +4,7 @@ import com.blibli.oss.backend.apiclient.annotation.ApiClient;
 import com.blibli.oss.backend.apiclient.body.ApiBodyResolver;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
+import com.blibli.oss.backend.apiclient.error.ApiErrorResolver;
 import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
@@ -63,12 +64,15 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private RequestMappingMetadata metadata;
 
+  private ApiErrorResolver errorResolver;
+
   @Override
   public void afterPropertiesSet() throws Exception {
     prepareAttribute();
     prepareWebClient();
     prepareFallback();
     prepareBodyResolvers();
+    prepareErrorResolver();
   }
 
   private void prepareAttribute() {
@@ -158,6 +162,19 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private void prepareBodyResolvers() {
     bodyResolvers = new ArrayList<>(applicationContext.getBeansOfType(ApiBodyResolver.class).values());
+  }
+
+  private void prepareErrorResolver() {
+    errorResolver = getErrorResolver();
+  }
+
+  private ApiErrorResolver getErrorResolver() {
+    ApiClient annotation = type.getAnnotation(ApiClient.class);
+    ApiErrorResolver apiErrorResolver = applicationContext.getBean(annotation.errorResolver());
+    if (Objects.nonNull(metadata.getProperties().getErrorResolver())) {
+      apiErrorResolver = applicationContext.getBean(metadata.getProperties().getErrorResolver());
+    }
+    return apiErrorResolver;
   }
 
   @Override
@@ -252,19 +269,18 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   private Mono doResponse(WebClient.RequestHeadersSpec<?> client, String methodName) {
     Type type = metadata.getResponseBodyClasses().get(methodName);
     if (type instanceof ParameterizedType) {
-      return client.retrieve()
-        .bodyToMono(ParameterizedTypeReference.forType(type));
+      return client.retrieve().bodyToMono(ParameterizedTypeReference.forType(type));
+    } else {
+      return client.retrieve().bodyToMono((Class) type);
     }
-
-    return client.retrieve().bodyToMono((Class) type);
   }
 
   private Mono doFallback(Throwable throwable, Method method, Object[] arguments) {
     if (Objects.nonNull(fallback)) {
-      log.error(throwable.getMessage(), throwable);
-      return (Mono) ReflectionUtils.invokeMethod(method, fallback, arguments);
+      return errorResolver.resolve(throwable, type, method, arguments)
+        .switchIfEmpty((Mono) ReflectionUtils.invokeMethod(method, fallback, arguments));
     } else {
-      return Mono.error(throwable);
+      return errorResolver.resolve(throwable, type, method, arguments);
     }
   }
 }

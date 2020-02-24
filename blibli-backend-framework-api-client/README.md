@@ -63,3 +63,5 @@ blibli.backend.apiclient.configs.binListApiClient.headers.Accept=application/jso
 ## Codec Customizer 
 
 ## Supported Body
+
+## Error Resolver

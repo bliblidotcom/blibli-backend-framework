@@ -3,6 +3,7 @@ package com.blibli.oss.backend.apiclient.configuration;
 import com.blibli.oss.backend.apiclient.body.FormBodyResolver;
 import com.blibli.oss.backend.apiclient.body.JsonBodyResolver;
 import com.blibli.oss.backend.apiclient.body.MultipartBodyResolver;
+import com.blibli.oss.backend.apiclient.error.DefaultApiErrorResolver;
 import com.blibli.oss.backend.apiclient.properties.ApiClientProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -32,6 +33,12 @@ public class ApiClientConfiguration {
   @ConditionalOnMissingBean
   public JsonBodyResolver jsonBodyResolver(ObjectMapper objectMapper) {
     return new JsonBodyResolver(objectMapper);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public DefaultApiErrorResolver defaultApiErrorResolver() {
+    return new DefaultApiErrorResolver();
   }
 
 }
