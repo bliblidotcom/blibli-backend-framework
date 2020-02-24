@@ -58,6 +58,52 @@ blibli.backend.apiclient.configs.binListApiClient.headers.Accept=application/jso
 
 ## Interceptor
 
+Some times we want to do something before or after http request using API Client. We can use `ApiClientInterceptor`.
+`ApiClientInterceptor` is interceptor that extend spring web client `ExchangeFilterFunction`. 
+We can add action before and after http request.
+
+```java
+@Component
+public class AggregateQueryApiClientInterceptor implements ApiClientInterceptor {
+
+  private AggregateQueryProperties aggregateQueryProperties;
+
+  @Override
+  public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
+    return Mono.just(request)
+      .map(clientRequest ->
+        ClientRequest
+          .from(clientRequest)
+          .header(AggregateQueryConstant.SERVICE_ID_HEADER, aggregateQueryProperties.getServiceId())
+          .build()
+      ).flatMap(next::exchange);
+  }
+}
+```  
+
+We can register `ApiClientInterceptor` using annotation :
+
+```java
+@ApiClient(
+  name = "aggregateQueryApiClient",
+  interceptors = {
+    AggregateQueryApiClientInterceptor.class
+  }
+)
+public interface AggregateQueryApiClient {
+  
+}
+```
+
+or using properties :
+
+```properties
+blibli.backend.apiclient.configs.aggregateQueryApiClient.interceptors[0]=com.blibli.oss.backend.aggregate.query.interceptor.AggregateQueryApiClientInterceptor
+blibli.backend.apiclient.configs.aggregateQueryApiClient.interceptors[1]=com.blibli.oss.backend.aggregate.query.interceptor.OtherInterceptor
+```
+
+We can add more than 1 `ApiClientInterceptor`
+
 ## Web Client Customizer
 
 ## Codec Customizer 
