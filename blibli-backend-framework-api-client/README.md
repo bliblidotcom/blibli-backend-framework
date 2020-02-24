@@ -102,9 +102,46 @@ blibli.backend.apiclient.configs.aggregateQueryApiClient.interceptors[0]=com.bli
 blibli.backend.apiclient.configs.aggregateQueryApiClient.interceptors[1]=com.blibli.oss.backend.aggregate.query.interceptor.OtherInterceptor
 ```
 
-We can add more than 1 `ApiClientInterceptor`
+We can add more than one `ApiClientInterceptor`
 
 ## Web Client Customizer
+
+Api Client Module using Spring WebClient as http client. Sometimes we want to change configuration of WebClient. 
+Api Client Module provide `ApiClientWebClientCustomizer` to customize WebClient creation.
+
+```java
+@Component
+public class BinListWebClientCustomizer implements ApiClientWebClientCustomizer {
+
+  @Override
+  public void customize(WebClient.Builder builder) {
+    builder.defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+    builder.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+  }
+}
+```  
+
+We can register `ApiClientWebClientCustomizer` using annotation :
+
+```java
+@ApiClient(
+  name = "binListApiClient",
+  webClientCustomizers = {
+    BinListWebClientCustomizer.class
+  }
+)
+public interface BinListApiClient {
+  
+}
+```
+
+Or using properties :
+
+```properties
+blibli.backend.apiclient.configs.binListApiClient.web-client-customizers[0]=com.blibli.oss.backend.example.client.customizer.BinListWebClientCustomizer
+```
+
+We can add more than one `ApiClientWebClientCustomizer`
 
 ## Codec Customizer 
 
