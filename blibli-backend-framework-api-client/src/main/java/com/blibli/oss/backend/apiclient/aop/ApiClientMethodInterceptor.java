@@ -19,7 +19,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
@@ -269,7 +271,26 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   private Mono doResponse(WebClient.RequestHeadersSpec<?> client, String methodName) {
     Type type = metadata.getResponseBodyClasses().get(methodName);
     if (type instanceof ParameterizedType) {
-      return client.retrieve().bodyToMono(ParameterizedTypeReference.forType(type));
+      ParameterizedType parameterizedType = (ParameterizedType) type;
+      if (ResponseEntity.class.equals(parameterizedType.getRawType())) {
+        WebClient.ResponseSpec responseEntitySpec = client.retrieve().onStatus(HttpStatus::isError, clientResponse -> Mono.empty());
+
+        if (parameterizedType.getActualTypeArguments()[0] instanceof ParameterizedType) {
+          ParameterizedType actualTypeArgument = (ParameterizedType) parameterizedType.getActualTypeArguments()[0];
+          if (List.class.equals(actualTypeArgument.getRawType())) {
+            return responseEntitySpec.toEntityList(ParameterizedTypeReference.forType(actualTypeArgument.getActualTypeArguments()[0]));
+          }
+        }
+
+        Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+        if (Void.class.equals(actualTypeArgument)) {
+          return responseEntitySpec.toBodilessEntity();
+        } else {
+          return responseEntitySpec.toEntity(ParameterizedTypeReference.forType(actualTypeArgument));
+        }
+      } else {
+        return client.retrieve().bodyToMono(ParameterizedTypeReference.forType(parameterizedType));
+      }
     } else {
       return client.retrieve().bodyToMono((Class) type);
     }

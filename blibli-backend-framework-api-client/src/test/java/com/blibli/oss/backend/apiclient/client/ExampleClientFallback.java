@@ -2,6 +2,8 @@ package com.blibli.oss.backend.apiclient.client;
 
 import com.blibli.oss.backend.apiclient.client.model.*;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Mono;
@@ -11,6 +13,21 @@ import java.util.List;
 
 @Component
 public class ExampleClientFallback implements ExampleClient {
+
+  @Override
+  public Mono<ResponseEntity<Void>> responseEntityVoid() {
+    return Mono.just(ResponseEntity.status(HttpStatus.OK).build());
+  }
+
+  @Override
+  public Mono<ResponseEntity<FirstResponse>> responseEntity() {
+    return Mono.just(ResponseEntity.ok(FirstResponse.builder().hello("Ups First").build()));
+  }
+
+  @Override
+  public Mono<ResponseEntity<List<FirstResponse>>> responseEntityList() {
+    return Mono.just(ResponseEntity.ok(Collections.singletonList(FirstResponse.builder().hello("Ups First").build())));
+  }
 
   @Override
   public Mono<FirstResponse> first(FirstRequest request) {

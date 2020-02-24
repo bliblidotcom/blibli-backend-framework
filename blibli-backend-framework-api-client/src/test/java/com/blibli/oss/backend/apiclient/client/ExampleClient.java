@@ -4,6 +4,7 @@ import com.blibli.oss.backend.apiclient.annotation.ApiClient;
 import com.blibli.oss.backend.apiclient.client.model.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -18,6 +19,26 @@ import java.util.List;
   }
 )
 public interface ExampleClient {
+
+  @RequestMapping(
+    method = RequestMethod.GET,
+    path = "/response-entity-void"
+  )
+  Mono<ResponseEntity<Void>> responseEntityVoid();
+
+  @RequestMapping(
+    method = RequestMethod.GET,
+    path = "/response-entity",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<ResponseEntity<FirstResponse>> responseEntity();
+
+  @RequestMapping(
+    method = RequestMethod.GET,
+    path = "/response-entity-list",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<ResponseEntity<List<FirstResponse>>> responseEntityList();
 
   @RequestMapping(
     method = RequestMethod.POST,

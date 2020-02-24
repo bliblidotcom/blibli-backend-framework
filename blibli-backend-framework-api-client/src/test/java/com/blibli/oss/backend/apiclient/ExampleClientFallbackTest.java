@@ -8,7 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,6 +26,26 @@ public class ExampleClientFallbackTest {
 
   @Autowired
   private ResourceLoader resourceLoader;
+
+  @Test
+  void testResponseEntityVoid() {
+    ResponseEntity<Void> entity = exampleClient.responseEntityVoid().block();
+    assertEquals(200, entity.getStatusCodeValue());
+  }
+
+  @Test
+  void testResponseEntity() {
+    ResponseEntity<FirstResponse> entity = exampleClient.responseEntity().block();
+    assertEquals(200, entity.getStatusCodeValue());
+    assertEquals("Ups First", entity.getBody().getHello());
+  }
+
+  @Test
+  void testResponseEntityList() {
+    ResponseEntity<List<FirstResponse>> entity = exampleClient.responseEntityList().block();
+    assertEquals(200, entity.getStatusCodeValue());
+    assertEquals("Ups First", entity.getBody().get(0).getHello());
+  }
 
   @Test
   void testFirst() {

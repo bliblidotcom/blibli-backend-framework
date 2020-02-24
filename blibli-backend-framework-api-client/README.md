@@ -148,3 +148,5 @@ We can add more than one `ApiClientWebClientCustomizer`
 ## Supported Body
 
 ## Error Resolver
+
+## ResponseEntity Support

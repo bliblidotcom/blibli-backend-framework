@@ -14,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -22,6 +23,7 @@ import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(classes = TestApplication.class)
 public class ExampleClientTest {
@@ -50,6 +52,64 @@ public class ExampleClientTest {
   static void beforeAll() {
     wireMockServer = new WireMockServer(8089);
     wireMockServer.start();
+  }
+
+  @Test
+  void testResponseEntityVoid() throws JsonProcessingException {
+    wireMockServer.stubFor(
+      get(urlPathEqualTo("/response-entity-void"))
+        .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .willReturn(
+          aResponse()
+            .withStatus(400)
+            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .withBody(objectMapper.writeValueAsString(FIRST_RESPONSE))
+        )
+    );
+
+    ResponseEntity<Void> response = exampleClient.responseEntityVoid().block();
+    assertNotNull(response);
+    assertEquals(400, response.getStatusCodeValue());
+  }
+
+  @Test
+  void testResponseEntity() throws JsonProcessingException {
+    wireMockServer.stubFor(
+      get(urlPathEqualTo("/response-entity"))
+        .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .willReturn(
+          aResponse()
+            .withStatus(400)
+            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .withBody(objectMapper.writeValueAsString(FIRST_RESPONSE))
+        )
+    );
+
+    ResponseEntity<FirstResponse> response = exampleClient.responseEntity().block();
+    assertNotNull(response);
+    assertEquals(400, response.getStatusCodeValue());
+    assertEquals(FIRST_RESPONSE, response.getBody());
+  }
+
+  @Test
+  void testResponseEntityList() throws JsonProcessingException {
+    wireMockServer.stubFor(
+      get(urlPathEqualTo("/response-entity-list"))
+        .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .willReturn(
+          aResponse()
+            .withStatus(400)
+            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .withBody(objectMapper.writeValueAsString(Collections.singletonList(FIRST_RESPONSE)))
+        )
+    );
+
+    ResponseEntity<List<FirstResponse>> response = exampleClient.responseEntityList().block();
+    assertNotNull(response);
+    assertEquals(400, response.getStatusCodeValue());
+    assertNotNull(response.getBody());
+    assertEquals(1, response.getBody().size());
+    assertEquals(FIRST_RESPONSE, response.getBody().get(0));
   }
 
   @Test
