@@ -229,3 +229,37 @@ blibli.backend.apiclient.configs.binListApiClient.error-resolver=com.blibli.oss.
 ```
 
 ## ResponseEntity Support
+
+API Client Module using Spring WebClient as http client. And by default, if response code is 4xx or 5xx, Spring WebClient will throw an exception.
+But sometimes we want to get all the detail of server response, like http status, headers and body. 
+To achieve this, API Client Module support Spring `ResponseEntity<T>`. If method return `Mono<ResponseEntity<T>>`, 
+API Client will get all server response, even if server response is 4xx or 5xx.
+
+```java
+@ApiClient(
+  name = "exampleClient"
+)
+public interface ExampleClient {
+
+  @RequestMapping(
+    method = RequestMethod.GET,
+    path = "/response-entity-void"
+  )
+  Mono<ResponseEntity<Void>> responseEntityVoid();
+
+  @RequestMapping(
+    method = RequestMethod.GET,
+    path = "/response-entity",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<ResponseEntity<FirstResponse>> responseEntity();
+
+  @RequestMapping(
+    method = RequestMethod.GET,
+    path = "/response-entity-list",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<ResponseEntity<List<FirstResponse>>> responseEntityList();
+
+}
+``` 
