@@ -181,6 +181,16 @@ blibli.backend.apiclient.configs.exampleApiClient.codec-customizers[0]=com.blibl
 
 ## Supported Body
 
+API Client Module is modular library, it support request body resolver to translate from `@RequestBody` parameter to low level http request.
+The resolver implemented using `ApiBodyResolver`. We can create custom `ApiBodyResolver` and add as spring bean. 
+API Client Module will automatically load it.
+
+By default, API Client module support 3 body resolver :
+
+- `multipart/form-data` using `MultipartBodyResolver`. This resolver will get all parameter with annotation `@RequestPart`
+- `application/json` using `JsonBodyResolver`. This resolver will convert `@RequestBody` object to JSON
+- `application/x-www-form-urlencoded` using `FormBodyResolver`. This resolver will convert `@RequestBody MultiValueMap<String, String>` to form body.
+
 ## Error Resolver
 
 ## ResponseEntity Support
