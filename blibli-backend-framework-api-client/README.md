@@ -145,6 +145,40 @@ We can add more than one `ApiClientWebClientCustomizer`
 
 ## Codec Customizer 
 
+In Spring WebClient, we can configure codec for HTTP reader and writer. In API Client module, we can also configure the codec using `ApiClientCodecCustomizer`
+
+```java
+@Component
+public class ExampleCodecCustomizer implements ApiClientCodecCustomizer {
+
+  @Override
+  public void customize(ClientCodecConfigurer configurer) {
+    configurer.defaultCodecs().enableLoggingRequestDetails(true);
+    configurer.defaultCodecs().maxInMemorySize(1000 * 1024);
+  }
+}
+```
+
+And we can register `ApiClientCodecCustomizer` using annotation :
+
+```java
+@ApiClient(
+  name = "exampleApiClient",
+  codecCustomizers = {
+    ExampleCodecCustomizer.class
+  }
+)
+public interface ExampleApiClient {
+
+}
+```
+
+or using properties :
+
+```properties
+blibli.backend.apiclient.configs.exampleApiClient.codec-customizers[0]=com.blibli.oss.backend.example.client.customizer.ExampleCodecCustomizer
+```
+
 ## Supported Body
 
 ## Error Resolver
