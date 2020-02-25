@@ -193,4 +193,39 @@ By default, API Client module support 3 body resolver :
 
 ## Error Resolver
 
+Sometimes we want to do something after we get error. Like connection error, parsing error, http response error, etc. 
+API Client Module provide `ApiErrorResolver` class to handle this. We can translate from error to `Mono<OtherResult>` if we want, 
+or if we want to continue to fallback, we can return `Mono.empty()`.
+
+```java
+@Slf4j
+@Component
+public class BinListErrorResolver implements ApiErrorResolver {
+
+  @Override
+  public Mono<Object> resolve(Throwable throwable, Class<?> type, Method method, Object[] arguments) {
+    log.error(String.format("Ups error call ApiClient %s.%s", type, method), throwable);
+    return Mono.empty(); // continue to fallback
+  }
+}
+```
+
+To register `ApiErrorResolver` we can use annotation :
+
+```java
+@ApiClient(
+  name = "binListApiClient",
+  errorResolver = BinListErrorResolver.class
+)
+public interface BinListApiClient {
+
+}
+```
+
+or properties :
+
+```properties
+blibli.backend.apiclient.configs.binListApiClient.error-resolver=com.blibli.oss.backend.example.client.error.BinListErrorResolver
+```
+
 ## ResponseEntity Support
