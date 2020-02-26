@@ -102,6 +102,60 @@ public class GetBinListCommandImpl implements GetBinListCommand {
 
 ## Command Interceptor
 
+Command Module support command interceptor. With command interceptor we can manipulate data before and after command executed.
+We only need to create spring bean of `CommandInterceptor`
 
+```java
+public interface CommandInterceptor {
+
+  // executed before execute command
+  default <R, T> Mono<T> before(Command<R, T> command, R request) {
+    // empty mean we will execute the command
+    // non empty mean we will return the data without execute the command
+    return Mono.empty();
+  }
+  
+  // executed after success execute command
+  default <R, T> Mono<Void> afterSuccess(Command<R, T> command, R request, T response) {
+    return Mono.empty();
+  }
+
+  // executed after failed execute command
+  default <R, T> Mono<Void> afterFailed(Command<R, T> command, R request, Throwable throwable) {
+    return Mono.empty();
+  }
+}
+```
 
 ## Caching
+
+`CommandInterceptor` is powerfull feature. We provide command caching using this feature. 
+Caching is feature for cache command result on redis after finish execute command. 
+With this feature, command will execute one time, and next time when we execute command again,
+it will directly return from redis. This can make slow command process become faster.
+
+```java
+@Service
+public class GetBinListCommandImpl implements GetBinListCommand {
+
+  @Override
+  public String cacheKey(GetBinListCommandRequest request) {
+    return request.getNumber(); // return cache key for redis
+  }
+
+  @Override
+  public Class<GetBinListWebResponse> responseClass() {
+    return GetBinListWebResponse.class; // return class for json mapper 
+  }
+```
+
+Command Module will cache the data using `ReactiveStringRedisTemplate`. So we need to make sure we have 
+`ReactiveStringRedisTemplate` bean on our spring application.
+
+By default, caching is disabled. You need to enabled it using configuration. 
+We can also change timeout cache using configuration properties.
+
+```properties
+blibli.backend.command.cache.enabled=true
+blibli.backend.command.cache.timeout=10m
+``` 
