@@ -15,11 +15,22 @@ To use blibli backend framework, we need to setup our pom.xml
     <relativePath/> <!-- lookup parent from repository -->
 </parent>
 
+<!-- Set blibli framework version -->
 <properties>
-    <!-- Set blibli framework version -->
     <blibli-framework.version>...</blibli-framework.version>
 </properties>
 
+<!-- add blibli bintray repository --> 
+<repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>bintray-bliblidotcom-maven</id>
+      <name>bintray</name>
+      <url>https://dl.bintray.com/bliblidotcom/maven</url>
+    </repository>
+</repositories>
 ```
 
 ## List of Libraries 
