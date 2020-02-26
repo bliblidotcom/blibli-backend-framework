@@ -45,3 +45,14 @@ To use blibli backend framework, we need to setup our pom.xml
 - [Command](blibli-backend-framework-command/README.md) : command pattern implementation
 - [Aggregate Query](blibli-backend-framework-aggregate-query/README.md) : api client for aggregate query 
 - [Scheduler Platform](blibli-backend-framework-scheduler-platform/README.md) : api client for scheduler platform   
+
+## Next Libraries
+
+- JSON: simplify json manipulation usage
+- Validation : reactive bean validation
+- Internal API : helper for internal api app
+- External API : helper for external api app
+- Distributed Trace : simplify distributed tracing usage
+- Zipkin : simplify zipkin usage
+- New Relic : simplify new relic usage
+- Log : api client for log platform
