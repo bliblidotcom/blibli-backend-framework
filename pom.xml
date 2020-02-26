@@ -25,7 +25,7 @@
 
   <groupId>com.blibli.oss</groupId>
   <artifactId>blibli-backend-framework</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.2</version>
 
   <name>blibli-backend-framework</name>
   <description>Blibli.com Backend Framework</description>
