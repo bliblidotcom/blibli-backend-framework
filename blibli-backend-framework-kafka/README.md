@@ -87,4 +87,53 @@ customerKafkaRepository.sendAndSubscribe(customerEvent, scheduler);
 
 ## Kafka Producer Interceptor
 
+Sometimes we want to do something before we send data to kafka. We can do it manually on our code. 
+Or Kafka Module already create `KafkaProducerInterceptor`. We can create bean class of `KafkaProducerInterceptor`, and register it to spring.
+
+```java
+public interface KafkaProducerInterceptor {
+
+  // this method will invoked before send data to kafka
+  default ProducerEvent beforeSend(ProducerEvent event) {
+    return event;
+  }
+
+}
+```
+
 ## Kafka Consumer Interceptor
+
+We can also add interceptor for kafka consumer using `KafkaConsumerInterceptor`. 
+
+```java
+public interface KafkaConsumerInterceptor {
+  
+  // invoked before kafka listener invoked. If return true, kafka module will stop process
+  default boolean beforeConsume(ConsumerRecord<String, String> consumerRecord) {
+    return false;
+  }
+
+  // invoked after kafka listener success consumed data
+  default void afterSuccessConsume(ConsumerRecord<String, String> consumerRecord) {
+
+  }
+
+  // invoked only if kafka listener failed consumed data and throw an exception
+  default void afterFailedConsume(ConsumerRecord<String, String> consumerRecord, Throwable throwable) {
+
+  }
+
+}
+```
+
+## Log Kafka Message
+
+Kafka Module already has `LogKafkaProducerInterceptor` and `LogKafkaConsumerInterceptor`. These interceptors are for log payload.
+By default, Kafka Module will not log any payload in producer and consumer interceptor. But we can make it enabed if we want using properties.
+
+```properties
+blibli.backend.kafka.logging.before-send=true
+blibli.backend.kafka.logging.before-consume=true
+blibli.backend.kafka.logging.after-success-consume=true
+blibli.backend.kafka.logging.after-failed-consume=true
+```
