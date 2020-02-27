@@ -33,6 +33,12 @@ To use blibli backend framework, we need to setup our pom.xml
 </repositories>
 ```
 
+## Example Project
+
+If you need example project, you can see this repository :
+
+[https://github.com/bliblidotcom/blibli-backend-framework-example](https://github.com/bliblidotcom/blibli-backend-framework-example)
+
 ## List of Libraries 
 
 - [Common](blibli-backend-framework-common/README.md) : standard request and response
