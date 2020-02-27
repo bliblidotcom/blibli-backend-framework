@@ -48,6 +48,6 @@ SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
 String jsonRequest = sourceBuilder.toString();
 
 Flux<Customer> response = aggregateQueryApiClient.search("customer_index", jsonRequest)
-  .map(value -> value.getHits().hitsAs(objectMapper, Customer.class))
+  .map(value -> value.getHits().hitsAs(map -> objectMapper.convertValue(map, Customer.class)))
   .flatMapMany(Flux::fromIterable);
 ```

@@ -70,7 +70,7 @@ public class ExampleTest {
     );
 
     Mono<ExampleResponse> response = aggregateQueryApiClient.get("index", "1")
-      .map(value -> value.sourceAs(objectMapper, ExampleResponse.class));
+      .map(value -> value.sourceAs(stringObjectMap -> objectMapper.convertValue(stringObjectMap, ExampleResponse.class)));
 
     StepVerifier.create(response)
       .expectNext(ExampleResponse.builder().id(1).firstName("Eko").middleName("Kurniawan").lastName("Khannedy").build())
@@ -100,7 +100,7 @@ public class ExampleTest {
     );
 
     Flux<ExampleResponse> response = aggregateQueryApiClient.search("index", request)
-      .map(value -> value.getHits().hitsAs(objectMapper, ExampleResponse.class))
+      .map(value -> value.getHits().hitsAs(stringObjectMap -> objectMapper.convertValue(stringObjectMap, ExampleResponse.class)))
       .flatMapMany(Flux::fromIterable);
 
     StepVerifier.create(response)
@@ -132,7 +132,7 @@ public class ExampleTest {
     );
 
     Flux<ExampleResponse> response = aggregateQueryApiClient.scroll("index", request)
-      .map(value -> value.getHits().hitsAs(objectMapper, ExampleResponse.class))
+      .map(value -> value.getHits().hitsAs(stringObjectMap -> objectMapper.convertValue(stringObjectMap, ExampleResponse.class)))
       .flatMapMany(Flux::fromIterable);
 
     StepVerifier.create(response)
@@ -177,7 +177,7 @@ public class ExampleTest {
     Flux<ExampleResponse> response = aggregateQueryApiClient.scroll("index", request)
       .map(AggregateQueryResponse::getScrollId)
       .flatMap(value -> aggregateQueryApiClient.nextScroll("index", value))
-      .map(value -> value.getHits().hitsAs(objectMapper, ExampleResponse.class))
+      .map(value -> value.getHits().hitsAs(stringObjectMap -> objectMapper.convertValue(stringObjectMap, ExampleResponse.class)))
       .flatMapMany(Flux::fromIterable);
 
     StepVerifier.create(response)
