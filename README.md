@@ -50,11 +50,11 @@ If you need example project, you can see this repository :
 - [Kafka](blibli-backend-framework-kafka/README.md) : simplify spring kafka usage
 - [Command](blibli-backend-framework-command/README.md) : command pattern implementation
 - [Aggregate Query](blibli-backend-framework-aggregate-query/README.md) : api client for aggregate query 
-- [Scheduler Platform](blibli-backend-framework-scheduler-platform/README.md) : api client for scheduler platform   
+- [Scheduler Platform](blibli-backend-framework-scheduler-platform/README.md) : api client for scheduler platform
+- [JSON](blibli-backend-framework-json/README.md): simplify json manipulation usage   
 
 ## Next Libraries
 
-- JSON: simplify json manipulation usage
 - Validation : reactive bean validation
 - Internal API : helper for internal api app
 - External API : helper for external api app
