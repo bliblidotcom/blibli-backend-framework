@@ -108,6 +108,16 @@
         <version>${blibli-framework.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.blibli.oss</groupId>
+        <artifactId>blibli-backend-framework-json</artifactId>
+        <version>${blibli-framework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.blibli.oss</groupId>
+        <artifactId>blibli-backend-framework-validation</artifactId>
+        <version>${blibli-framework.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.springdoc</groupId>
         <artifactId>springdoc-openapi-webflux-ui</artifactId>
         <version>${springdoc.version}</version>
