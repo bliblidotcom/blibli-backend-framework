@@ -52,10 +52,10 @@ If you need example project, you can see this repository :
 - [Aggregate Query](blibli-backend-framework-aggregate-query/README.md) : api client for aggregate query 
 - [Scheduler Platform](blibli-backend-framework-scheduler-platform/README.md) : api client for scheduler platform
 - [JSON](blibli-backend-framework-json/README.md): simplify json manipulation usage   
+- [Validation](blibli-backend-framework-validation/README.md) : reactive bean validation
 
 ## Next Libraries
 
-- Validation : reactive bean validation
 - Internal API : helper for internal api app
 - External API : helper for external api app
 - Distributed Trace : simplify distributed tracing usage
