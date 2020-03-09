@@ -9,7 +9,7 @@ JSON module will simplify this, this can be used to help us do json manipulation
 ```xml
 <dependency>
   <groupId>com.blibli.oss</groupId>
-  <artifactId>blibli-backend-framework-kafka</artifactId>
+  <artifactId>blibli-backend-framework-json</artifactId>
 </dependency>
 ```
 
