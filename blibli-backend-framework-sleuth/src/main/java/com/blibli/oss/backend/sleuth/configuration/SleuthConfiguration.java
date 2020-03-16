@@ -17,11 +17,21 @@ import java.util.List;
 public class SleuthConfiguration {
 
   @Autowired(required = false)
-  ExtraFieldPropagation.FactoryBuilder extraFieldPropagationFactoryBuilder;
+  private ExtraFieldPropagation.FactoryBuilder extraFieldPropagationFactoryBuilder;
 
   @Autowired(required = false)
-  List<ExtraFieldCustomizer> extraFieldCustomizers = new ArrayList<>();
+  private List<ExtraFieldCustomizer> extraFieldCustomizers = new ArrayList<>();
 
+  /**
+   * This bean is copied from TraceAutoConfiguration class,
+   * with some modification to support extra fields that can integrated for http and messaging
+   *
+   * @param extraFieldConfiguration extra field configuration
+   * @param sleuthProperties        sleuth properties
+   * @return new bean
+   * @see org.springframework.cloud.sleuth.autoconfig.TraceAutoConfiguration
+   * @see org.springframework.cloud.sleuth.autoconfig.TraceAutoConfiguration#sleuthPropagation(SleuthProperties)
+   */
   @Bean
   Propagation.Factory sleuthPropagation(SleuthExtraFieldConfiguration extraFieldConfiguration, SleuthProperties sleuthProperties) {
     if (sleuthProperties.getBaggageKeys().isEmpty()
@@ -38,6 +48,7 @@ public class SleuthConfiguration {
       factoryBuilder = ExtraFieldPropagation
         .newFactoryBuilder(B3Propagation.FACTORY);
     }
+    // modification to merge baggage from properties and from bean
     List<String> baggageKeys = extraFieldConfiguration.getExtraFields(sleuthProperties.getBaggageKeys());
     if (!baggageKeys.isEmpty()) {
       factoryBuilder
