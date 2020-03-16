@@ -16,6 +16,7 @@
     <module>blibli-backend-framework-scheduler-platform</module>
     <module>blibli-backend-framework-json</module>
     <module>blibli-backend-framework-validation</module>
+    <module>blibli-backend-framework-sleuth</module>
   </modules>
 
   <parent>

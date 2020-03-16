@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.blibli.oss.backend.sleuth.configuration.SleuthConfiguration
