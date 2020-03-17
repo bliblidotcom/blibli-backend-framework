@@ -62,7 +62,7 @@ String storeId = ExtraFieldPropagation.get(span.context(), "StoreId");
 ## Tracer on Web Filter
 
 Using Tracer on WebFilter is not easy. By default current span is not active on web filter. 
-To simplify this, we can use class `SleuthWebFilter` as abstract class. The filter method will have `Span` parameter.
+To simplify this, we can use class `SleuthWebFilter` as base interface. The filter method will have `Span` parameter.
 
 ```java
 @Component
