@@ -34,7 +34,9 @@ public class SleuthConfiguration {
    */
   @Bean
   public Propagation.Factory sleuthPropagation(SleuthExtraFieldConfiguration extraFieldConfiguration, SleuthProperties sleuthProperties) {
-    if (sleuthProperties.getBaggageKeys().isEmpty()
+    // modification to merge baggage from properties and from bean
+    List<String> baggageKeys = extraFieldConfiguration.getExtraFields(sleuthProperties.getBaggageKeys());
+    if (baggageKeys.isEmpty()
       && sleuthProperties.getPropagationKeys().isEmpty()
       && extraFieldCustomizers.isEmpty()
       && this.extraFieldPropagationFactoryBuilder == null
@@ -48,8 +50,6 @@ public class SleuthConfiguration {
       factoryBuilder = ExtraFieldPropagation
         .newFactoryBuilder(B3Propagation.FACTORY);
     }
-    // modification to merge baggage from properties and from bean
-    List<String> baggageKeys = extraFieldConfiguration.getExtraFields(sleuthProperties.getBaggageKeys());
     if (!baggageKeys.isEmpty()) {
       factoryBuilder
         // for HTTP

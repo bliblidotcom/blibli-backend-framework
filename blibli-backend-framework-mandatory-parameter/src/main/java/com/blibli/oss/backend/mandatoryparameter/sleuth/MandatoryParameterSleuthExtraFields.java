@@ -10,11 +10,11 @@ public class MandatoryParameterSleuthExtraFields implements SleuthExtraFields {
   @Override
   public List<String> getFields() {
     return Arrays.asList(
-      MandatoryParamSleuth.CHANNEL_ID,
-      MandatoryParamSleuth.CLIENT_ID,
-      MandatoryParamSleuth.REQUEST_ID,
-      MandatoryParamSleuth.STORE_ID,
-      MandatoryParamSleuth.USERNAME
+      MandatoryParameterSleuth.CHANNEL_ID,
+      MandatoryParameterSleuth.CLIENT_ID,
+      MandatoryParameterSleuth.REQUEST_ID,
+      MandatoryParameterSleuth.STORE_ID,
+      MandatoryParameterSleuth.USERNAME
     );
   }
 }

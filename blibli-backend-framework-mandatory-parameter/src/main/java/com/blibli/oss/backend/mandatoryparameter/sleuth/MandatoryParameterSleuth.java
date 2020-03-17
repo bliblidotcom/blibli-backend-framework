@@ -1,6 +1,6 @@
 package com.blibli.oss.backend.mandatoryparameter.sleuth;
 
-public interface MandatoryParamSleuth {
+public interface MandatoryParameterSleuth {
 
   String STORE_ID = "MandatoryParam-StoreId";
 
