@@ -33,7 +33,7 @@ public class SleuthConfiguration {
    * @see org.springframework.cloud.sleuth.autoconfig.TraceAutoConfiguration#sleuthPropagation(SleuthProperties)
    */
   @Bean
-  Propagation.Factory sleuthPropagation(SleuthExtraFieldConfiguration extraFieldConfiguration, SleuthProperties sleuthProperties) {
+  public Propagation.Factory sleuthPropagation(SleuthExtraFieldConfiguration extraFieldConfiguration, SleuthProperties sleuthProperties) {
     if (sleuthProperties.getBaggageKeys().isEmpty()
       && sleuthProperties.getPropagationKeys().isEmpty()
       && extraFieldCustomizers.isEmpty()
