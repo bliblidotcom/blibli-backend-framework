@@ -1,4 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.blibli.oss.backend.mandatoryparameter.MandatoryParameterAutoConfiguration,\
   com.blibli.oss.backend.mandatoryparameter.swagger.MandatoryParameterSwaggerAutoConfiguration,\
-  com.blibli.oss.backend.mandatoryparameter.webflux.MandatoryParameterWebFluxAutoConfiguration
+  com.blibli.oss.backend.mandatoryparameter.webflux.MandatoryParameterWebFluxAutoConfiguration,\
+  com.blibli.oss.backend.mandatoryparameter.sleuth.MandatoryParameterSleuthAutoConfiguration
