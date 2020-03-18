@@ -113,3 +113,37 @@ public static class SleuthService {
 
 }
 ```
+
+## API Client Integration
+
+Sometimes our service need to hit other backend service using API Client. And Other backend service also required 
+mandatory parameter. To simplify this, we don't need to do it manually passing mandatory parameter using query param
+or header. This module also support forward mandatory parameter to api client using interceptor `MandatoryParameterApiClientInterceptor`.
+
+We can use interceptor in @ApiClient annotation 
+
+```java
+@ApiClient(
+  name = "secondApiClient",
+  interceptors = {
+    MandatoryParameterApiClientInterceptor.class
+  }
+)
+public interface SecondApiClient {
+
+  @RequestMapping(
+    value = "/second",
+    method = RequestMethod.GET,
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<Map<String, String>> second();
+
+}
+```
+
+or using properties
+
+```properties
+blibli.backend.apiclient.configs.firstApiClient.url=http://first-service-host:8080
+blibli.backend.apiclient.configs.firstApiClient.interceptors[0]=com.blibli.oss.backend.mandatoryparameter.apiclient.MandatoryParameterApiClientInterceptor
+```
