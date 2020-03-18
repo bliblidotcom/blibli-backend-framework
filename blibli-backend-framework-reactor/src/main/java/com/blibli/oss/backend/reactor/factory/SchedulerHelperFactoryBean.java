@@ -51,10 +51,24 @@ public class SchedulerHelperFactoryBean implements FactoryBean<SchedulerHelper> 
         return newExecutorScheduler(properties.getExecutor());
       case THREAD_POOL:
         return newThreadPollScheduler(properties.getThreadPool());
+      case BOUNDED_ELASTIC:
+        return Schedulers.boundedElastic();
+      case NEW_BOUNDED_ELASTIC:
+        return newBoundedElastic(properties.getNewBoundedElastic());
       case IMMEDIATE:
       default:
         return Schedulers.immediate();
     }
+  }
+
+  private Scheduler newBoundedElastic(SchedulerProperties.SchedulerNewBoundedElasticProperties properties) {
+    return Schedulers.newBoundedElastic(
+      properties.getThreadSize(),
+      properties.getQueueSize(),
+      properties.getName(),
+      (int) properties.getTtl().getSeconds(),
+      properties.getDaemon()
+    );
   }
 
   private Scheduler newThreadPollScheduler(SchedulerProperties.SchedulerThreadPoolProperties properties) {
