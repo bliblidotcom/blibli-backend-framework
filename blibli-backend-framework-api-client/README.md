@@ -211,6 +211,27 @@ blibli.backend.apiclient.configs.aggregateQueryApiClient.interceptors[1]=com.bli
 
 We can add more than one `ApiClientInterceptor`
 
+## Global Interceptor
+
+By default, Interceptor only works per API Client. Sometimes we want to create global interceptor, what works on all 
+API Client. To handle this problem, API Client module also has `GlobalApiClientInterceptor` interface. We only need to
+create spring bean of this interface, and it will automatically registered to all API Client.
+
+```java
+@Component
+public static class EchoGlobalApiClientInterceptor implements GlobalApiClientInterceptor {
+
+@Override
+public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
+  return Mono.fromCallable(() ->
+    ClientRequest.from(request)
+      .header("POWERED-BY", "BLIBLI")
+      .build()
+  ).flatMap(next::exchange);
+}
+}
+```
+
 ## Web Client Customizer
 
 Api Client Module using Spring WebClient as http client. Sometimes we want to change configuration of WebClient. 
@@ -370,3 +391,34 @@ public interface ExampleClient {
 
 }
 ``` 
+
+## Log API Client Request and Response
+
+Spring WebClient already support log request and response. But this is not recommended on production, becuase can
+make our app more slow. But it's good for debug our API Client. To log request and response for API Client, we can 
+use configuration properties.
+
+```properties
+spring.http.log-request-details=true
+
+logging.level.org.springframework.web.reactive.function.client.ExchangeFunctions=TRACE
+```
+
+This is example request and response log
+
+```
+2020-03-18 17:09:28.854 TRACE 98271 --- [           main] o.s.w.r.f.client.ExchangeFunctions       : [3fa21d49] HTTP POST http://localhost:8089/fifth, headers={masked}
+2020-03-18 17:09:28.882 TRACE 98271 --- [ctor-http-nio-1] o.s.w.r.f.client.ExchangeFunctions       : [3fa21d49] Response 200 OK, headers={masked}
+
+2020-03-18 17:09:28.895 TRACE 98271 --- [           main] o.s.w.r.f.client.ExchangeFunctions       : [2ed71727] HTTP POST http://localhost:8089/first, headers={masked}
+2020-03-18 17:09:28.913 TRACE 98271 --- [ctor-http-nio-1] o.s.w.r.f.client.ExchangeFunctions       : [2ed71727] Response 200 OK, headers={masked}
+
+2020-03-18 17:09:28.925 TRACE 98271 --- [           main] o.s.w.r.f.client.ExchangeFunctions       : [72a2312e] HTTP GET http://localhost:8089/forth/eko?size=100&page=1, headers={masked}
+2020-03-18 17:09:28.974 TRACE 98271 --- [ctor-http-nio-1] o.s.w.r.f.client.ExchangeFunctions       : [72a2312e] Response 200 OK, headers={masked}
+
+2020-03-18 17:09:28.998 TRACE 98271 --- [           main] o.s.w.r.f.client.ExchangeFunctions       : [7a3269f5] HTTP POST http://localhost:8089/sixth, headers={masked}
+2020-03-18 17:09:29.109 TRACE 98271 --- [ctor-http-nio-1] o.s.w.r.f.client.ExchangeFunctions       : [7a3269f5] Response 200 OK, headers={masked}
+```
+
+If we want to create more details logs, for example log the body, cookie, etc. We also can create our logger interceptor
+using `ApiClientInterceptor` or `GlobalApiClientInterceptor`.

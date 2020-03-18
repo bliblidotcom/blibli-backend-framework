@@ -6,6 +6,7 @@ import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
 import com.blibli.oss.backend.apiclient.error.ApiErrorResolver;
 import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
+import com.blibli.oss.backend.apiclient.interceptor.GlobalApiClientInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -29,6 +30,7 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
@@ -142,8 +144,8 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     return apiClientWebClientCustomizers;
   }
 
-  private Set<ApiClientInterceptor> getApiClientInterceptors() {
-    Set<ApiClientInterceptor> interceptors = new HashSet<>();
+  private Set<ExchangeFilterFunction> getApiClientInterceptors() {
+    Set<ExchangeFilterFunction> interceptors = new HashSet<>();
     metadata.getProperties().getInterceptors().forEach(interceptorClass ->
       interceptors.add(applicationContext.getBean(interceptorClass))
     );
@@ -152,6 +154,9 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     for (Class<? extends ApiClientInterceptor> interceptor : annotation.interceptors()) {
       interceptors.add(applicationContext.getBean(interceptor));
     }
+
+    // Add GlobalApiClientInterceptor
+    interceptors.addAll(applicationContext.getBeansOfType(GlobalApiClientInterceptor.class).values());
     return interceptors;
   }
 

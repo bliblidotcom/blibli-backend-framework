@@ -37,6 +37,7 @@ public class ExampleClientTest {
       .value("Test Generics")
       .build();
   public static final SecondResponse SECOND_RESPONSE = SecondResponse.builder().hello("Hello").build();
+  public static final String ECHO = "ECHO";
   private static WireMockServer wireMockServer;
 
   @Autowired
@@ -59,6 +60,7 @@ public class ExampleClientTest {
     wireMockServer.stubFor(
       get(urlPathEqualTo("/response-entity-void"))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .willReturn(
           aResponse()
             .withStatus(400)
@@ -77,6 +79,7 @@ public class ExampleClientTest {
     wireMockServer.stubFor(
       get(urlPathEqualTo("/response-entity"))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .willReturn(
           aResponse()
             .withStatus(400)
@@ -96,6 +99,7 @@ public class ExampleClientTest {
     wireMockServer.stubFor(
       get(urlPathEqualTo("/response-entity-list"))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .willReturn(
           aResponse()
             .withStatus(400)
@@ -118,6 +122,7 @@ public class ExampleClientTest {
       post(urlPathEqualTo("/first"))
         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo(MediaType.APPLICATION_JSON_VALUE))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .withRequestBody(equalTo(objectMapper.writeValueAsString(FIRST_REQUEST)))
         .willReturn(
           aResponse()
@@ -135,6 +140,7 @@ public class ExampleClientTest {
     wireMockServer.stubFor(
       get(urlPathEqualTo("/second"))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .willReturn(
           aResponse()
             .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -151,6 +157,7 @@ public class ExampleClientTest {
     wireMockServer.stubFor(
       get(urlPathEqualTo("/third/eko"))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .willReturn(
           aResponse()
             .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -170,6 +177,7 @@ public class ExampleClientTest {
         .withQueryParam("size", equalTo("100"))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
         .withHeader("X-API", equalTo("api"))
+        .withHeader(ECHO, equalTo(ECHO))
         .willReturn(
           aResponse()
             .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -187,6 +195,7 @@ public class ExampleClientTest {
       post(urlPathEqualTo("/fifth"))
         .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .withRequestBody(containing("firstName"))
         .withRequestBody(containing("lastName"))
         .withRequestBody(containing("Eko"))
@@ -212,6 +221,7 @@ public class ExampleClientTest {
       post(urlPathEqualTo("/sixth"))
         .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.MULTIPART_FORM_DATA_VALUE))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .withRequestBody(containing("file"))
         .willReturn(
           aResponse()
@@ -231,6 +241,7 @@ public class ExampleClientTest {
       post(urlPathEqualTo("/generics"))
         .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.APPLICATION_JSON_VALUE))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .withRequestBody(equalTo("testing"))
         .willReturn(
           aResponse()
@@ -249,6 +260,7 @@ public class ExampleClientTest {
       post(urlPathEqualTo("/generics-two"))
         .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.APPLICATION_JSON_VALUE))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .withRequestBody(equalTo("testing"))
         .willReturn(
           aResponse()
@@ -272,6 +284,7 @@ public class ExampleClientTest {
       post(urlPathEqualTo("/inherited"))
         .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.APPLICATION_JSON_VALUE))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .withRequestBody(equalTo("testing"))
         .willReturn(
           aResponse()
@@ -299,6 +312,7 @@ public class ExampleClientTest {
       post(urlPathEqualTo("/generic-inherited"))
         .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.APPLICATION_JSON_VALUE))
         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
+        .withHeader(ECHO, equalTo(ECHO))
         .withRequestBody(equalTo("testing"))
         .willReturn(
           aResponse()
