@@ -56,6 +56,66 @@ blibli.backend.apiclient.configs.binListApiClient.headers.Accept=application/jso
 
 `binListApiClient` is name of `@ApiClient(name)`
 
+## Default Configuration
+
+Sometimes we have multiple API Client with same configuration, like headers, or interceptor. API Client module support
+default configuration, where we can share configuration for all API Client.
+
+Without default configuration, we need to create properties like this :
+
+```properties
+blibli.backend.apiclient.configs.firstApiClient.url=https://firt-host:8080
+blibli.backend.apiclient.configs.firstApiClient.connect-timeout=2s
+blibli.backend.apiclient.configs.firstApiClient.read-timeout=2s
+blibli.backend.apiclient.configs.firstApiClient.write-timeout=2s
+blibli.backend.apiclient.configs.firstApiClient.headers.Accept=application/json
+blibli.backend.apiclient.configs.firstApiClient.headers.Content-Type=application/json
+blibli.backend.apiclient.configs.firstApiClient.interceptors[0]=com.company.project.apiclient.interceptor.YourGlobalInterceptor
+blibli.backend.apiclient.configs.firstApiClient.interceptors[1]=com.company.project.apiclient.interceptor.YourFirstInterceptor
+
+blibli.backend.apiclient.configs.secondApiClient.url=https://second-host:8080
+blibli.backend.apiclient.configs.secondApiClient.connect-timeout=2s
+blibli.backend.apiclient.configs.secondApiClient.read-timeout=2s
+blibli.backend.apiclient.configs.secondApiClient.write-timeout=2s
+blibli.backend.apiclient.configs.secondApiClient.headers.Accept=application/json
+blibli.backend.apiclient.configs.secondApiClient.headers.Content-Type=application/json
+blibli.backend.apiclient.configs.secondApiClient.interceptors[0]=com.company.project.apiclient.interceptor.YourGlobalInterceptor
+blibli.backend.apiclient.configs.secondApiClient.interceptors[1]=com.company.project.apiclient.interceptor.YourSecondInterceptor
+
+blibli.backend.apiclient.configs.thirdApiClient.url=https://third-host:8080
+blibli.backend.apiclient.configs.thirdApiClient.connect-timeout=2s
+blibli.backend.apiclient.configs.thirdApiClient.read-timeout=2s
+blibli.backend.apiclient.configs.thirdApiClient.write-timeout=2s
+blibli.backend.apiclient.configs.thirdApiClient.headers.Accept=application/json
+blibli.backend.apiclient.configs.thirdApiClient.headers.Content-Type=application/json
+blibli.backend.apiclient.configs.thirdApiClient.interceptors[0]=com.company.project.apiclient.interceptor.YourGlobalInterceptor
+blibli.backend.apiclient.configs.thirdApiClient.interceptors[1]=com.company.project.apiclient.interceptor.YourThirdInterceptor
+```
+
+With default configuration, we can simplify properties file like this :
+
+```properties
+# default properties
+blibli.backend.apiclient.configs.default.connect-timeout=2s
+blibli.backend.apiclient.configs.default.read-timeout=2s
+blibli.backend.apiclient.configs.default.write-timeout=2s
+blibli.backend.apiclient.configs.default.headers.Accept=application/json
+blibli.backend.apiclient.configs.default.headers.Content-Type=application/json
+blibli.backend.apiclient.configs.default.interceptors[0]=com.company.project.apiclient.interceptor.YourGlobalInterceptor
+
+blibli.backend.apiclient.configs.firstApiClient.url=https://firt-host:8080
+blibli.backend.apiclient.configs.firstApiClient.interceptors[0]=com.company.project.apiclient.interceptor.YourFirstInterceptor
+
+blibli.backend.apiclient.configs.secondApiClient.url=https://second-host:8080
+blibli.backend.apiclient.configs.secondApiClient.interceptors[0]=com.company.project.apiclient.interceptor.YourSecondInterceptor
+
+blibli.backend.apiclient.configs.thirdApiClient.url=https://third-host:8080
+blibli.backend.apiclient.configs.thirdApiClient.interceptors[0]=com.company.project.apiclient.interceptor.YourThirdInterceptor
+``` 
+
+With default properties, all config from default properties will copies to our API Client properties. But the config will be copied only
+if API Client properties is null, so it will not override existing properties.
+
 ## Fallback
 
 Error is part of service integration and handling error manually is really annoying. API Client module already support
