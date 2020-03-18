@@ -56,6 +56,53 @@ blibli.backend.apiclient.configs.binListApiClient.headers.Accept=application/jso
 
 `binListApiClient` is name of `@ApiClient(name)`
 
+## Fallback
+
+Error is part of service integration and handling error manually is really annoying. API Client module already support
+fallback if there is error (network error, response error, etc). 
+
+We can use fallback parameter on @ApiClient annotation
+
+```java
+@Component
+public class AggregateQueryApiClientFallback implements AggregateQueryApiClient {
+
+  @Override
+  public Mono<AggregateQueryHit<Map<String, Object>>> get(String index, String id) {
+    return Mono.just(AggregateQueryHit.<Map<String, Object>>builder()
+      .found(false)
+      .id(id)
+      .index(index)
+      .score(0.0)
+      .version(0)
+      .source(Collections.emptyMap())
+      .build());
+  }
+
+}
+
+@ApiClient(
+  name = "aggregateQueryApiClient",
+  fallback = AggregateQueryApiClientFallback.class
+)
+public interface AggregateQueryApiClient {
+
+  @RequestMapping(
+    value = "/api-native/{index}/{id}",
+    method = RequestMethod.GET,
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<AggregateQueryHit<Map<String, Object>>> get(@PathVariable("index") String index,
+                                                   @PathVariable("id") String id);
+}
+```
+ 
+or using properties
+
+```properties
+blibli.backend.apiclient.configs.aggregateQueryApiClient.fallback=com.example.project.apiclient.fallback.ServiceApiClientFallback
+``` 
+
 ## Interceptor
 
 Some times we want to do something before or after http request using API Client. We can use `ApiClientInterceptor`.

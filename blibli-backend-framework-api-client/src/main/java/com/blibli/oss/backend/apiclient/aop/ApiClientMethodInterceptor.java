@@ -160,6 +160,10 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     if (annotation.fallback() != Void.class) {
       fallback = applicationContext.getBean(annotation.fallback());
     }
+
+    if (Objects.nonNull(metadata.getProperties().getFallback())) {
+      fallback = applicationContext.getBean(metadata.getProperties().getFallback());
+    }
   }
 
   private void prepareBodyResolvers() {
@@ -167,16 +171,12 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   private void prepareErrorResolver() {
-    errorResolver = getErrorResolver();
-  }
-
-  private ApiErrorResolver getErrorResolver() {
     ApiClient annotation = type.getAnnotation(ApiClient.class);
-    ApiErrorResolver apiErrorResolver = applicationContext.getBean(annotation.errorResolver());
+    errorResolver = applicationContext.getBean(annotation.errorResolver());
+
     if (Objects.nonNull(metadata.getProperties().getErrorResolver())) {
-      apiErrorResolver = applicationContext.getBean(metadata.getProperties().getErrorResolver());
+      errorResolver = applicationContext.getBean(metadata.getProperties().getErrorResolver());
     }
-    return apiErrorResolver;
   }
 
   @Override
