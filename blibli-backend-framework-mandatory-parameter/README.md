@@ -93,3 +93,23 @@ blibli.backend.mandatoryparameter.query-key.request-id-default-value=requestId
 blibli.backend.mandatoryparameter.query-key.store-id-default-value=storeId
 blibli.backend.mandatoryparameter.query-key.username-default-value=username
 ```
+
+## Sleuth Integration
+
+Sometimes we want to get mandatory parameter not only in Controller, maybe on Service or other class. 
+Thanks to spring sleuth, we can set and get baggage from anywhere using Tracer. Mandatory Parameter module
+already support integration with spring sleuth. So we can get mandatory parameter from span.
+
+```java
+@Service
+public static class SleuthService {
+
+  @Autowired
+  private Tracer tracer;
+
+  public Mono<MandatoryParameter> getMandatoryParameter() {
+    return Mono.fromCallable(() -> MandatoryParameterHelper.fromSleuth(tracer.currentSpan().context()));
+  }
+
+}
+```

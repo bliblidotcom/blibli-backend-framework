@@ -14,6 +14,11 @@
   <dependencies>
     <dependency>
       <groupId>com.blibli.oss</groupId>
+      <artifactId>blibli-backend-framework-sleuth</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.blibli.oss</groupId>
       <artifactId>blibli-backend-framework-swagger</artifactId>
       <scope>provided</scope>
     </dependency>
