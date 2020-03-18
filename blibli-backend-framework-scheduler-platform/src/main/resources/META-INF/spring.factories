@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.blibli.oss.scheduler.platform.configuration.SchedulerPlatformConfiguration
+  com.blibli.oss.backend.scheduler.platform.configuration.SchedulerPlatformConfiguration
