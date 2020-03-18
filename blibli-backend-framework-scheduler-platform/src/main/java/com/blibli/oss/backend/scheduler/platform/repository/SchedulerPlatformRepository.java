@@ -1,8 +1,8 @@
-package com.blibli.oss.scheduler.platform.repository;
+package com.blibli.oss.backend.scheduler.platform.repository;
 
 import com.blibli.oss.backend.kafka.repository.AbstractKafkaRepository;
 import com.blibli.oss.backend.kafka.repository.KafkaRepository;
-import com.blibli.oss.scheduler.platform.model.SchedulerPlatformModel;
+import com.blibli.oss.backend.scheduler.platform.model.SchedulerPlatformModel;
 
 public class SchedulerPlatformRepository
   extends AbstractKafkaRepository<SchedulerPlatformModel>

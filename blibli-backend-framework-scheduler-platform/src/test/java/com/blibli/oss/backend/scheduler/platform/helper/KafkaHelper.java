@@ -1,4 +1,4 @@
-package com.blibli.oss.scheduler.platform.helper;
+package com.blibli.oss.backend.scheduler.platform.helper;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

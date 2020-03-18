@@ -1,11 +1,11 @@
-package com.blibli.oss.scheduler.platform.repository;
+package com.blibli.oss.backend.scheduler.platform.repository;
 
-import com.blibli.oss.scheduler.platform.constant.SchedulerPlatformTopics;
-import com.blibli.oss.scheduler.platform.helper.KafkaHelper;
-import com.blibli.oss.scheduler.platform.model.CancelDelayedJobRequest;
-import com.blibli.oss.scheduler.platform.model.CancelScheduledJobRequest;
-import com.blibli.oss.scheduler.platform.model.DelayedJobRequest;
-import com.blibli.oss.scheduler.platform.model.ScheduledJobRequest;
+import com.blibli.oss.backend.scheduler.platform.constant.SchedulerPlatformTopics;
+import com.blibli.oss.backend.scheduler.platform.helper.KafkaHelper;
+import com.blibli.oss.backend.scheduler.platform.model.CancelDelayedJobRequest;
+import com.blibli.oss.backend.scheduler.platform.model.CancelScheduledJobRequest;
+import com.blibli.oss.backend.scheduler.platform.model.DelayedJobRequest;
+import com.blibli.oss.backend.scheduler.platform.model.ScheduledJobRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.Consumer;

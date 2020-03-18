@@ -1,4 +1,4 @@
-package com.blibli.oss.scheduler.platform.constant;
+package com.blibli.oss.backend.scheduler.platform.constant;
 
 public interface SchedulerPlatformTopics {
 
