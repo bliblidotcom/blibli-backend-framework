@@ -2,11 +2,11 @@ package com.blibli.oss.backend.reactor.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Data
 @ConfigurationProperties("blibli.backend.reactor.scheduler")
@@ -29,6 +29,8 @@ public class SchedulerProperties {
 
     private SchedulerThreadPoolProperties threadPool = new SchedulerThreadPoolProperties();
 
+    private SchedulerNewBoundedElasticProperties newBoundedElastic = new SchedulerNewBoundedElasticProperties();
+
   }
 
   @Data
@@ -47,9 +49,7 @@ public class SchedulerProperties {
 
     private String name;
 
-    private Integer parallelism = Optional.ofNullable(System.getProperty("reactor.schedulers.defaultPoolSize"))
-      .map(Integer::parseInt)
-      .orElseGet(() -> Runtime.getRuntime().availableProcessors());
+    private Integer parallelism = Schedulers.DEFAULT_POOL_SIZE;
 
     private Boolean daemon = false;
   }
@@ -100,6 +100,21 @@ public class SchedulerProperties {
 
   }
 
+  @Data
+  public static class SchedulerNewBoundedElasticProperties {
+
+    private Integer threadSize = Schedulers.DEFAULT_BOUNDED_ELASTIC_SIZE;
+
+    private Integer queueSize = Schedulers.DEFAULT_BOUNDED_ELASTIC_QUEUESIZE;
+
+    private String name = "boundedElastic";
+
+    private Duration ttl = Duration.ofSeconds(60);
+
+    private Boolean daemon = Boolean.TRUE;
+
+  }
+
   public enum QueueType {
 
     ARRAY,
@@ -117,7 +132,9 @@ public class SchedulerProperties {
     NEW_PARALLEL,
     NEW_SINGLE,
     EXECUTOR,
-    THREAD_POOL
+    THREAD_POOL,
+    BOUNDED_ELASTIC,
+    NEW_BOUNDED_ELASTIC
 
   }
 }
