@@ -29,12 +29,21 @@ public class ApiClientProperties {
 
   private String packages;
 
+  /**
+   * Every time you add attributes, don't forget to update merge method with
+   * default properties at {@link PropertiesHelper#copyConfigProperties(ApiClientConfigProperties, ApiClientConfigProperties)}
+   *
+   * @see PropertiesHelper#copyConfigProperties(ApiClientConfigProperties, ApiClientConfigProperties)
+   * @see com.blibli.oss.backend.apiclient.aop.RequestMappingMetadataBuilder#mergeApiClientConfigProperties(ApiClientConfigProperties, ApiClientConfigProperties)
+   */
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
   public static class ApiClientConfigProperties {
 
     private String url;
+
+    private Class<?> fallback;
 
     @DurationUnit(ChronoUnit.MILLIS)
     private Duration readTimeout = Duration.ofMillis(2000L);
