@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.blibli.oss.backend.apiclient.configuration.ApiClientConfiguration,\
-com.blibli.oss.backend.apiclient.configuration.ApiClientRegistrar
+com.blibli.oss.backend.apiclient.configuration.ApiClientRegistrar,\
+com.blibli.oss.backend.apiclient.sleuth.ApiClientSleuthConfiguration

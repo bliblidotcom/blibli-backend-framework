@@ -4,6 +4,7 @@ import com.blibli.oss.backend.apiclient.client.ExampleInterceptor;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientTcpClientCustomizer;
 import com.blibli.oss.backend.apiclient.interceptor.GlobalApiClientInterceptor;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.netty.NettyReactiveWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -14,6 +15,11 @@ import reactor.netty.tcp.TcpClient;
 
 @SpringBootApplication
 public class TestApplication {
+
+  @Bean
+  public NettyReactiveWebServerFactory nettyReactiveWebServerFactory(){
+    return new NettyReactiveWebServerFactory();
+  }
 
   @Bean
   public ExampleInterceptor exampleInterceptor() {

@@ -17,6 +17,11 @@
       <artifactId>blibli-backend-framework-reactor</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.blibli.oss</groupId>
+      <artifactId>blibli-backend-framework-sleuth</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
     </dependency>

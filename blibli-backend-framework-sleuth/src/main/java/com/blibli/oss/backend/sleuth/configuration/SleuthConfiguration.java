@@ -16,6 +16,9 @@ import java.util.List;
 @Configuration
 public class SleuthConfiguration {
 
+  public static final String HTTP_BAGGAGE_PREFIX = "baggage-";
+  public static final String MESSAGING_BAGGAGE_PREFIX = "baggage_";
+
   @Autowired(required = false)
   private ExtraFieldPropagation.FactoryBuilder extraFieldPropagationFactoryBuilder;
 
@@ -53,9 +56,9 @@ public class SleuthConfiguration {
     if (!baggageKeys.isEmpty()) {
       factoryBuilder
         // for HTTP
-        .addPrefixedFields("baggage-", baggageKeys)
+        .addPrefixedFields(HTTP_BAGGAGE_PREFIX, baggageKeys)
         // for messaging
-        .addPrefixedFields("baggage_", baggageKeys);
+        .addPrefixedFields(MESSAGING_BAGGAGE_PREFIX, baggageKeys);
     }
     if (!sleuthProperties.getPropagationKeys().isEmpty()) {
       for (String key : sleuthProperties.getPropagationKeys()) {
