@@ -8,6 +8,7 @@ import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
 import com.blibli.oss.backend.apiclient.error.ApiErrorResolver;
 import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
 import com.blibli.oss.backend.apiclient.interceptor.GlobalApiClientInterceptor;
+import com.blibli.oss.backend.reactor.scheduler.SchedulerHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -29,6 +30,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -36,6 +38,8 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 
@@ -71,6 +75,8 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private ApiErrorResolver errorResolver;
 
+  private Scheduler scheduler;
+
   @Override
   public void afterPropertiesSet() throws Exception {
     prepareAttribute();
@@ -78,6 +84,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     prepareFallback();
     prepareBodyResolvers();
     prepareErrorResolver();
+    prepareScheduler();
   }
 
   private void prepareAttribute() {
@@ -204,6 +211,14 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     }
   }
 
+  private void prepareScheduler() {
+    SchedulerHelper schedulerHelper = applicationContext.getBean(SchedulerHelper.class);
+    ApiClient annotation = type.getAnnotation(ApiClient.class);
+    if (schedulerHelper.of(annotation.name()) != Schedulers.immediate()) {
+      scheduler = schedulerHelper.of(annotation.name());
+    }
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -211,13 +226,19 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     String methodName = method.toString();
     Object[] arguments = invocation.getArguments();
 
-    return Mono.fromCallable(() -> webClient)
+    Mono mono = Mono.fromCallable(() -> webClient)
       .map(client -> doMethod(methodName))
       .map(client -> client.uri(uriBuilder -> getUri(uriBuilder, methodName, arguments)))
       .map(client -> doHeader(client, methodName, arguments))
       .map(client -> doBody(client, method, methodName, arguments))
       .flatMap(client -> doResponse(client, methodName))
       .onErrorResume(throwable -> doFallback((Throwable) throwable, method, arguments));
+
+    if (Objects.nonNull(scheduler)) {
+      return mono.subscribeOn(scheduler);
+    } else {
+      return mono;
+    }
   }
 
   private WebClient.RequestHeadersUriSpec<?> doMethod(String methodName) {

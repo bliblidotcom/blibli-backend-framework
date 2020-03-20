@@ -457,3 +457,30 @@ or using properties
 ```properties
 blibli.backend.apiclient.configs.exampleClient.tcp-client-customizers[0]=com.yourcompany.project.apiclient.customizer.WireTrapTcpClientCustomizer
 ```
+
+## Reactor Scheduler Support
+
+API Client already non blocking using Netty. So by default you don't need to limit the request. But maybe sometimes we want
+to limit the request using Reactor Scheduler, for example because target server is slow, so we want to limit number of thread
+for API Client.
+
+To handle this, API Client already support `SchedulerHelper` of Reactor Module. We only need to create scheduler using properties
+with same name with API Client.
+
+```java
+@ApiClient(
+  name = "exampleClient"
+)
+public interface ExampleClient {
+  
+}
+```
+
+```properties
+blibli.backend.reactor.scheduler.configs.exampleClient.type=thread_pool
+blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.allow-core-thread-time-out=false
+blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.core-pool-size=10
+blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.maximum-pool-size=100
+blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.queue-size=100
+blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.queue-type=linked
+```
