@@ -1,6 +1,7 @@
 package com.blibli.oss.backend.apiclient.properties;
 
 import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
+import com.blibli.oss.backend.apiclient.customizer.ApiClientTcpClientCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
 import com.blibli.oss.backend.apiclient.error.ApiErrorResolver;
 import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
@@ -61,6 +62,8 @@ public class ApiClientProperties {
     private List<Class<? extends ApiClientWebClientCustomizer>> webClientCustomizers = new ArrayList<>();
 
     private List<Class<? extends ApiClientCodecCustomizer>> codecCustomizers = new ArrayList<>();
+
+    private List<Class<? extends ApiClientTcpClientCustomizer>> tcpClientCustomizers = new ArrayList<>();
 
     private Class<? extends ApiErrorResolver> errorResolver;
 
