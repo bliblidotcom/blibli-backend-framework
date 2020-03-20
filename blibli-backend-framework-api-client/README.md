@@ -520,6 +520,6 @@ public interface DynamicClient {
 @Autowired
 private DynamicClient dynamicClient;
 
-String baseUrl = "http://your-server.com/";
+String baseUrl = "http://your-server.com";
 dynamicClient.action(baseUrl);
 ```
