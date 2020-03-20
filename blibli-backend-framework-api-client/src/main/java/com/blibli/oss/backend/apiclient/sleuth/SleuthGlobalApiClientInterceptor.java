@@ -20,7 +20,7 @@ public class SleuthGlobalApiClientInterceptor implements GlobalApiClientIntercep
 
   @Override
   public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
-    if (properties.getSleuth().isEnabled()) {
+    if (properties.getSleuth().isEnabled() && tracer.currentSpan() != null) {
       return Mono.fromCallable(() -> {
         ClientRequest.Builder builder = ClientRequest.from(request);
         ExtraFieldPropagation.getAll(tracer.currentSpan().context()).forEach((key, value) -> {

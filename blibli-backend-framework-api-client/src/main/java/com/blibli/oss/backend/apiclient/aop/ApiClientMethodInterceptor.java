@@ -228,7 +228,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
     Mono mono = Mono.fromCallable(() -> webClient)
       .map(client -> doMethod(methodName))
-      .map(client -> client.uri(uriBuilder -> getUri(uriBuilder, methodName, arguments)))
+      .map(client -> getUriBuilder(methodName, arguments, client))
       .map(client -> doHeader(client, methodName, arguments))
       .map(client -> doBody(client, method, methodName, arguments))
       .flatMap(client -> doResponse(client, methodName))
@@ -259,6 +259,15 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
       return webClient.head();
     } else {
       return webClient.get();
+    }
+  }
+
+  private WebClient.RequestHeadersSpec<?> getUriBuilder(String methodName, Object[] arguments, WebClient.RequestHeadersUriSpec<?> client) {
+    if (metadata.getApiUrlPositions().containsKey(methodName)) {
+      String baseUrl = (String) arguments[metadata.getApiUrlPositions().get(methodName)];
+      return client.uri(baseUrl, uriBuilder -> getUri(uriBuilder, methodName, arguments));
+    } else {
+      return client.uri(uriBuilder -> getUri(uriBuilder, methodName, arguments));
     }
   }
 

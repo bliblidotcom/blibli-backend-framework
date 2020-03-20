@@ -1,5 +1,6 @@
 package com.blibli.oss.backend.apiclient.aop;
 
+import com.blibli.oss.backend.apiclient.annotation.ApiUrl;
 import com.blibli.oss.backend.apiclient.properties.ApiClientProperties;
 import com.blibli.oss.backend.apiclient.properties.PropertiesHelper;
 import org.springframework.beans.factory.BeanCreationException;
@@ -27,6 +28,8 @@ public class RequestMappingMetadataBuilder {
   private ApiClientProperties.ApiClientConfigProperties properties;
 
   private Map<String, MultiValueMap<String, String>> headers = new HashMap<>();
+
+  private Map<String, Integer> apiUrlPositions = new HashMap<>();
 
   private Map<String, Map<String, Integer>> queryParamPositions = new HashMap<>();
 
@@ -143,6 +146,24 @@ public class RequestMappingMetadataBuilder {
               if (!StringUtils.isEmpty(name)) {
                 queryParamPosition.put(name, i);
               }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private void prepareApiUrl() {
+    methods.forEach((methodName, method) -> {
+      RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+      if (requestMapping != null) {
+        Parameter[] parameters = method.getParameters();
+        if (parameters.length > 0) {
+          for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            ApiUrl annotation = parameter.getAnnotation(ApiUrl.class);
+            if (annotation != null) {
+              apiUrlPositions.put(methodName, i);
             }
           }
         }
@@ -285,6 +306,7 @@ public class RequestMappingMetadataBuilder {
     preparePaths();
     prepareCookieParams();
     prepareContentTypes();
+    prepareApiUrl();
 
     return RequestMappingMetadata.builder()
       .properties(properties)
@@ -298,6 +320,7 @@ public class RequestMappingMetadataBuilder {
       .paths(paths)
       .cookieParamPositions(cookieParamPositions)
       .contentTypes(contentTypes)
+      .apiUrlPositions(apiUrlPositions)
       .build();
   }
 
