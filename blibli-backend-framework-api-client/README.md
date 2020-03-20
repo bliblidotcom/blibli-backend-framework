@@ -494,3 +494,32 @@ automatically. If you want to disabled API Client with sleuth integration, you c
 # Enabled disabled api client x sleuth, default is true
 blibli.backend.apiclient.sleuth.enabled=true
 ```
+
+## Dynamic URL on Method Parameter
+
+API Client also support dynamic base url if we need this. For example in situation where we want to define the base url at runtime.
+To use dynamic url, we only need to add `String` baseUrl parameter on method, and add annotation `@ApiUrl`.
+
+```java
+@ApiClient(
+  name = "dynamicClient"
+)
+public interface DynamicClient {
+
+  @RequestMapping(
+    method = RequestMethod.GET,
+    value = "/dynamic",
+    produces = MediaType.TEXT_PLAIN_VALUE
+  )
+  Mono<String> action(@ApiUrl String baseUrl);
+
+}
+```
+
+```java
+@Autowired
+private DynamicClient dynamicClient;
+
+String baseUrl = "http://your-server.com/";
+dynamicClient.action(baseUrl);
+```
