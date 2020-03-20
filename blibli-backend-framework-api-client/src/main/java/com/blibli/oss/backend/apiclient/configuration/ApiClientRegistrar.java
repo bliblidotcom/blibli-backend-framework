@@ -2,6 +2,7 @@ package com.blibli.oss.backend.apiclient.configuration;
 
 import com.blibli.oss.backend.apiclient.annotation.ApiClient;
 import com.blibli.oss.backend.apiclient.aop.ApiClientMethodInterceptor;
+import com.blibli.oss.backend.reactor.ReactorAutoConfiguration;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.ProxyFactoryBean;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -30,6 +32,7 @@ import java.util.*;
 
 @Slf4j
 @Configuration
+@AutoConfigureAfter({ReactorAutoConfiguration.class})
 public class ApiClientRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
 
   public static final String METHOD_INTERCEPTOR = "MethodInterceptor";
