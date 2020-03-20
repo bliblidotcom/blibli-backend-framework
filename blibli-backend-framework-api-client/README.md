@@ -439,3 +439,21 @@ public class WireTrapTcpClientCustomizer implements ApiClientTcpClientCustomizer
     }
 }
 ``` 
+
+And we can register to API Client using annotation :
+
+```java
+@ApiClient(
+  name = "helloApiClient",
+  tcpClientCustomizers = WireTrapTcpClientCustomizer.class
+)
+public interface HelloApiClient {
+  
+}
+```
+
+or using properties 
+
+```properties
+blibli.backend.apiclient.configs.exampleClient.tcp-client-customizers[0]=com.yourcompany.project.apiclient.customizer.WireTrapTcpClientCustomizer
+```
