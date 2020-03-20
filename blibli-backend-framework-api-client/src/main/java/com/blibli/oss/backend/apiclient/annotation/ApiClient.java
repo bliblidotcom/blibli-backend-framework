@@ -1,6 +1,7 @@
 package com.blibli.oss.backend.apiclient.annotation;
 
 import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
+import com.blibli.oss.backend.apiclient.customizer.ApiClientTcpClientCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
 import com.blibli.oss.backend.apiclient.error.ApiErrorResolver;
 import com.blibli.oss.backend.apiclient.error.DefaultApiErrorResolver;
@@ -24,6 +25,8 @@ public @interface ApiClient {
   Class<? extends ApiClientWebClientCustomizer>[] webClientCustomizers() default {};
 
   Class<? extends ApiClientCodecCustomizer>[] codecCustomizers() default {};
+
+  Class<? extends ApiClientTcpClientCustomizer>[] tcpClientCustomizers() default {};
 
   Class<? extends ApiErrorResolver> errorResolver() default DefaultApiErrorResolver.class;
 

@@ -422,3 +422,20 @@ This is example request and response log
 
 If we want to create more details logs, for example log the body, cookie, etc. We also can create our logger interceptor
 using `ApiClientInterceptor` or `GlobalApiClientInterceptor`.
+
+## Tcp Client Customizer
+
+API Client using Spring Web Client as http client. And Spring Web Client use Netty. Sometimes we want to customize Netty TCP Client.
+API Client support this with interface `ApiClientTcpClientCustomizer`, we only need to create the bean of `ApiClientTcpClientCustomizer`
+and API Client will automatically call `customize(TcpClient)` method.
+
+```java
+@Component
+public class WireTrapTcpClientCustomizer implements ApiClientTcpClientCustomizer {
+
+    @Override
+    public TcpClient customize(TcpClient tcpClient) {
+      return tcpClient.wiretap(true);
+    }
+}
+``` 

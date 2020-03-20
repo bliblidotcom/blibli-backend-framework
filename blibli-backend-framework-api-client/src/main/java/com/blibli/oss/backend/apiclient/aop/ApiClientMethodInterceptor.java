@@ -3,6 +3,7 @@ package com.blibli.oss.backend.apiclient.aop;
 import com.blibli.oss.backend.apiclient.annotation.ApiClient;
 import com.blibli.oss.backend.apiclient.body.ApiBodyResolver;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
+import com.blibli.oss.backend.apiclient.customizer.ApiClientTcpClientCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
 import com.blibli.oss.backend.apiclient.error.ApiErrorResolver;
 import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
@@ -99,12 +100,18 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   private TcpClient getTcpClient() {
-    return TcpClient.create()
+    TcpClient tcpClient = TcpClient.create()
       .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) metadata.getProperties().getConnectTimeout().toMillis())
       .doOnConnected(connection -> connection
         .addHandlerLast(new ReadTimeoutHandler(metadata.getProperties().getReadTimeout().toMillis(), TimeUnit.MILLISECONDS))
         .addHandlerLast(new WriteTimeoutHandler(metadata.getProperties().getWriteTimeout().toMillis(), TimeUnit.MILLISECONDS))
       );
+
+    for (ApiClientTcpClientCustomizer customizer : getApiClientTcpClientCustomizers()) {
+      tcpClient = customizer.customize(tcpClient);
+    }
+
+    return tcpClient;
   }
 
   private ExchangeStrategies getExchangeStrategies() {
@@ -142,6 +149,19 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
       apiClientWebClientCustomizers.add(applicationContext.getBean(interceptor));
     }
     return apiClientWebClientCustomizers;
+  }
+
+  private Set<ApiClientTcpClientCustomizer> getApiClientTcpClientCustomizers() {
+    Set<ApiClientTcpClientCustomizer> customizers = new HashSet<>();
+    metadata.getProperties().getTcpClientCustomizers().forEach(interceptorClass ->
+      customizers.add(applicationContext.getBean(interceptorClass))
+    );
+
+    ApiClient annotation = type.getAnnotation(ApiClient.class);
+    for (Class<? extends ApiClientTcpClientCustomizer> customizer : annotation.tcpClientCustomizers()) {
+      customizers.add(applicationContext.getBean(customizer));
+    }
+    return customizers;
   }
 
   private Set<ExchangeFilterFunction> getApiClientInterceptors() {

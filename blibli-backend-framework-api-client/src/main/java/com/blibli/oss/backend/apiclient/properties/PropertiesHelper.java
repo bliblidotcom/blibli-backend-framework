@@ -36,6 +36,8 @@ public class PropertiesHelper {
 
       source.getCodecCustomizers().forEach(aClass -> target.getCodecCustomizers().add(aClass));
 
+      source.getTcpClientCustomizers().forEach(aClass -> target.getTcpClientCustomizers().add(aClass));
+
       if (Objects.nonNull(source.getErrorResolver())) {
         target.setErrorResolver(source.getErrorResolver());
       }
