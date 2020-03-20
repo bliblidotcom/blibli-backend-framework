@@ -27,6 +27,8 @@ public class RequestMappingMetadata {
 
   private Map<String, MultiValueMap<String, String>> headers = new HashMap<>();
 
+  private Map<String, Integer> apiUrlPositions = new HashMap<>();
+
   private Map<String, Map<String, Integer>> queryParamPositions = new HashMap<>();
 
   private Map<String, Map<String, Integer>> headerParamPositions = new HashMap<>();
