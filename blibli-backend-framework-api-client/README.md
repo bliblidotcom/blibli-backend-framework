@@ -484,3 +484,13 @@ blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.maximum-pool-
 blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.queue-size=100
 blibli.backend.reactor.scheduler.configs.exampleClient.thread-pool.queue-type=linked
 ```
+
+## Sleuth Integration
+
+By default, all Sleuth extra fields will be send to all API Client. So on target service, we can also get the Sleuth extra fields 
+automatically. If you want to disabled API Client with sleuth integration, you can disabled using properties
+
+```properties
+# Enabled disabled api client x sleuth, default is true
+blibli.backend.apiclient.sleuth.enabled=true
+```

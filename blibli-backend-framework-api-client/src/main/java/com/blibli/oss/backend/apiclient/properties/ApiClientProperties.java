@@ -30,6 +30,17 @@ public class ApiClientProperties {
 
   private String packages;
 
+  private ApiClientSleuthProperties sleuth = new ApiClientSleuthProperties();
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class ApiClientSleuthProperties {
+
+    private boolean enabled = true;
+
+  }
+
   /**
    * Every time you add attributes, don't forget to update merge method with
    * default properties at {@link PropertiesHelper#copyConfigProperties(ApiClientConfigProperties, ApiClientConfigProperties)}
