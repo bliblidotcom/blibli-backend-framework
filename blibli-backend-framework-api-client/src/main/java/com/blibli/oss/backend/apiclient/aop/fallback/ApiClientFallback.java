@@ -31,9 +31,7 @@ public class ApiClientFallback {
 
         Method methodWithException = metadata.getExceptionMethods().get(method);
         if (Objects.nonNull(methodWithException)) {
-          Object[] target = new Object[arguments.length + 1];
-          System.arraycopy(arguments, 0, target, 0, arguments.length);
-          target[target.length - 1] = exception;
+          Object[] target = getArgumentsWithException(arguments, exception);
           return (Mono) ReflectionUtils.invokeMethod(methodWithException, fallback, target);
         }
 
@@ -44,6 +42,13 @@ public class ApiClientFallback {
 
         return Mono.error(exception);
       });
+  }
+
+  private Object[] getArgumentsWithException(Object[] arguments, Throwable exception) {
+    Object[] target = new Object[arguments.length + 1];
+    System.arraycopy(arguments, 0, target, 0, arguments.length);
+    target[target.length - 1] = exception;
+    return target;
   }
 
 }
