@@ -163,6 +163,40 @@ or using properties
 blibli.backend.apiclient.configs.aggregateQueryApiClient.fallback=com.example.project.apiclient.fallback.ServiceApiClientFallback
 ``` 
 
+## Fallback with Exception Information
+
+Sometimes we need to create fallback response based on exception type. In API Client, we also can get exception on fallback.
+In fallback method, we can add on last parameter, `Throwable` parameter. And API Client will automatically pass exception
+to the parameter.
+
+```java
+@ApiClient(
+  name = "helloClient",
+  fallback = HelloClientFallback.class
+)
+public interface HelloClient {
+
+  @RequestMapping(
+    method = RequestMethod.POST,
+    path = "/first",
+    consumes = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<FirstResponse> first(@RequestBody FirstRequest request);
+
+}
+```
+
+```java
+@Component
+public class HelloClientFallback {
+
+  public Mono<FirstResponse> first(FirstRequest request, Throwable throwable) {
+    // return fallback response based on throwable
+  }
+
+}
+``` 
+
 ## Interceptor
 
 Some times we want to do something before or after http request using API Client. We can use `ApiClientInterceptor`.
