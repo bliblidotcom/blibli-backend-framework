@@ -1,6 +1,9 @@
 package com.blibli.oss.backend.apiclient.aop;
 
 import com.blibli.oss.backend.apiclient.annotation.ApiClient;
+import com.blibli.oss.backend.apiclient.aop.fallback.ApiClientFallback;
+import com.blibli.oss.backend.apiclient.aop.fallback.FallbackMetadata;
+import com.blibli.oss.backend.apiclient.aop.fallback.FallbackMetadataBuilder;
 import com.blibli.oss.backend.apiclient.body.ApiBodyResolver;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientTcpClientCustomizer;
@@ -29,7 +32,6 @@ import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -68,9 +70,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private WebClient webClient;
 
-  private Object fallback;
-
-  private FallbackMetadata fallbackMetadata;
+  private ApiClientFallback apiClientFallback;
 
   private RequestMappingMetadata metadata;
 
@@ -190,6 +190,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private void prepareFallback() {
     ApiClient annotation = type.getAnnotation(ApiClient.class);
+    Object fallback = null;
     if (annotation.fallback() != Void.class) {
       fallback = applicationContext.getBean(annotation.fallback());
     }
@@ -198,9 +199,15 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
       fallback = applicationContext.getBean(metadata.getProperties().getFallback());
     }
 
+    FallbackMetadata metadata = null;
     if (Objects.nonNull(fallback)) {
-      fallbackMetadata = new FallbackMetadataBuilder(type, fallback.getClass()).build();
+      metadata = new FallbackMetadataBuilder(type, fallback.getClass()).build();
     }
+
+    apiClientFallback = ApiClientFallback.builder()
+      .fallback(fallback)
+      .metadata(metadata)
+      .build();
   }
 
   private void prepareBodyResolvers() {
@@ -357,35 +364,11 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   private Mono doFallback(Throwable throwable, Method method, Object[] arguments) {
-    if (Objects.nonNull(fallback)) {
+    if (apiClientFallback.isAvailable()) {
       return errorResolver.resolve(throwable, type, method, arguments)
-        .switchIfEmpty(invokeFallback(throwable, method, arguments));
+        .switchIfEmpty(apiClientFallback.invoke(method, arguments, throwable));
     } else {
       return errorResolver.resolve(throwable, type, method, arguments);
     }
-  }
-
-  private Mono invokeFallback(Throwable throwable, Method method, Object[] arguments) {
-    return Mono.just(throwable)
-      .flatMap(exception -> {
-        if (method.getDeclaringClass().isAssignableFrom(fallback.getClass())) {
-          return (Mono) ReflectionUtils.invokeMethod(method, fallback, arguments);
-        }
-
-        Method methodWithException = fallbackMetadata.getExceptionMethods().get(method);
-        if (Objects.nonNull(methodWithException)) {
-          Object[] target = new Object[arguments.length + 1];
-          System.arraycopy(arguments, 0, target, 0, arguments.length);
-          target[target.length - 1] = throwable;
-          return (Mono) ReflectionUtils.invokeMethod(methodWithException, fallback, target);
-        }
-
-        Method fallbackMethod = fallbackMetadata.getMethods().get(method);
-        if (Objects.nonNull(fallbackMethod)) {
-          return (Mono) ReflectionUtils.invokeMethod(fallbackMethod, fallback, arguments);
-        }
-
-        return Mono.error(throwable);
-      });
   }
 }

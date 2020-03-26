@@ -1,4 +1,4 @@
-package com.blibli.oss.backend.apiclient.aop;
+package com.blibli.oss.backend.apiclient.aop.fallback;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
