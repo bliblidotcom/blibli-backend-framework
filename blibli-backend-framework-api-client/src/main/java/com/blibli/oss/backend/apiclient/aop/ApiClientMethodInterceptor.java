@@ -1,6 +1,9 @@
 package com.blibli.oss.backend.apiclient.aop;
 
 import com.blibli.oss.backend.apiclient.annotation.ApiClient;
+import com.blibli.oss.backend.apiclient.aop.fallback.ApiClientFallback;
+import com.blibli.oss.backend.apiclient.aop.fallback.FallbackMetadata;
+import com.blibli.oss.backend.apiclient.aop.fallback.FallbackMetadataBuilder;
 import com.blibli.oss.backend.apiclient.body.ApiBodyResolver;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientCodecCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientTcpClientCustomizer;
@@ -29,8 +32,6 @@ import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -69,7 +70,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private WebClient webClient;
 
-  private Object fallback;
+  private ApiClientFallback apiClientFallback;
 
   private RequestMappingMetadata metadata;
 
@@ -189,6 +190,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private void prepareFallback() {
     ApiClient annotation = type.getAnnotation(ApiClient.class);
+    Object fallback = null;
     if (annotation.fallback() != Void.class) {
       fallback = applicationContext.getBean(annotation.fallback());
     }
@@ -196,6 +198,16 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     if (Objects.nonNull(metadata.getProperties().getFallback())) {
       fallback = applicationContext.getBean(metadata.getProperties().getFallback());
     }
+
+    FallbackMetadata metadata = null;
+    if (Objects.nonNull(fallback)) {
+      metadata = new FallbackMetadataBuilder(type, fallback.getClass()).build();
+    }
+
+    apiClientFallback = ApiClientFallback.builder()
+      .fallback(fallback)
+      .metadata(metadata)
+      .build();
   }
 
   private void prepareBodyResolvers() {
@@ -352,9 +364,9 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   private Mono doFallback(Throwable throwable, Method method, Object[] arguments) {
-    if (Objects.nonNull(fallback)) {
+    if (apiClientFallback.isAvailable()) {
       return errorResolver.resolve(throwable, type, method, arguments)
-        .switchIfEmpty((Mono) ReflectionUtils.invokeMethod(method, fallback, arguments));
+        .switchIfEmpty(apiClientFallback.invoke(method, arguments, throwable));
     } else {
       return errorResolver.resolve(throwable, type, method, arguments);
     }
