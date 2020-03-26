@@ -30,7 +30,6 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -70,6 +69,8 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   private WebClient webClient;
 
   private Object fallback;
+
+  private FallbackMetadata fallbackMetadata;
 
   private RequestMappingMetadata metadata;
 
@@ -195,6 +196,10 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
     if (Objects.nonNull(metadata.getProperties().getFallback())) {
       fallback = applicationContext.getBean(metadata.getProperties().getFallback());
+    }
+
+    if (Objects.nonNull(fallback)) {
+      fallbackMetadata = new FallbackMetadataBuilder(type, fallback.getClass()).build();
     }
   }
 
@@ -354,9 +359,33 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   private Mono doFallback(Throwable throwable, Method method, Object[] arguments) {
     if (Objects.nonNull(fallback)) {
       return errorResolver.resolve(throwable, type, method, arguments)
-        .switchIfEmpty((Mono) ReflectionUtils.invokeMethod(method, fallback, arguments));
+        .switchIfEmpty(invokeFallback(throwable, method, arguments));
     } else {
       return errorResolver.resolve(throwable, type, method, arguments);
     }
+  }
+
+  private Mono invokeFallback(Throwable throwable, Method method, Object[] arguments) {
+    return Mono.just(throwable)
+      .flatMap(exception -> {
+        if (method.getDeclaringClass().isAssignableFrom(fallback.getClass())) {
+          return (Mono) ReflectionUtils.invokeMethod(method, fallback, arguments);
+        }
+
+        Method methodWithException = fallbackMetadata.getExceptionMethods().get(method);
+        if (Objects.nonNull(methodWithException)) {
+          Object[] target = new Object[arguments.length + 1];
+          System.arraycopy(arguments, 0, target, 0, arguments.length);
+          target[target.length - 1] = throwable;
+          return (Mono) ReflectionUtils.invokeMethod(methodWithException, fallback, target);
+        }
+
+        Method fallbackMethod = fallbackMetadata.getMethods().get(method);
+        if (Objects.nonNull(fallbackMethod)) {
+          return (Mono) ReflectionUtils.invokeMethod(fallbackMethod, fallback, arguments);
+        }
+
+        return Mono.error(throwable);
+      });
   }
 }
