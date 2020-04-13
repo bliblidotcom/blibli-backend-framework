@@ -2,13 +2,10 @@ package com.blibli.oss.backend.kafka.interceptor.consumer;
 
 import com.blibli.oss.backend.kafka.interceptor.KafkaConsumerInterceptor;
 import com.blibli.oss.backend.kafka.producer.KafkaProducer;
-import com.blibli.oss.backend.kafka.producer.helper.KafkaHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,26 +15,24 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.lang.reflect.Method;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = KafkaConsumerInterceptorTest.Application.class)
 @EmbeddedKafka(
-  topics = KafkaConsumerInterceptorTest.TOPIC
+  topics = {KafkaConsumerInterceptorTest.TOPIC, KafkaConsumerInterceptorTest.TOPIC_GOODBYE}
 )
 @DirtiesContext
 class KafkaConsumerInterceptorTest {
 
   public static final String TOPIC = "KafkaConsumerInterceptorTest";
 
-  @Autowired
-  private EmbeddedKafkaBroker broker;
+  public static final String TOPIC_GOODBYE = "KafkaConsumerInterceptorTestGoodBye";
 
   @Autowired
   private KafkaProducer kafkaProducer;
@@ -48,17 +43,13 @@ class KafkaConsumerInterceptorTest {
   @Autowired
   private HelloInterceptor helloInterceptor;
 
-  private Consumer<String, String> consumer;
+  @Autowired
+  private CounterInterceptor counterInterceptor;
 
   @BeforeEach
   void setUp() {
-    consumer = KafkaHelper.newConsumer(broker);
-    broker.consumeFromEmbeddedTopics(consumer, TOPIC);
-  }
-
-  @AfterEach
-  void tearDown() {
-    consumer.close();
+    helloInterceptor.reset();
+    counterInterceptor.reset();
   }
 
   @Test
@@ -69,13 +60,13 @@ class KafkaConsumerInterceptorTest {
     Assertions.assertEquals(helloListener.key, "key");
     Assertions.assertEquals(helloListener.value, "value");
 
-    helloInterceptor.reset();
-
     kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.elastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
     Assertions.assertEquals(helloInterceptor.beforeConsume, "value");
     Assertions.assertEquals(helloInterceptor.afterSuccess, "value");
+    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 0);
+    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 0);
   }
 
   @Test
@@ -85,6 +76,8 @@ class KafkaConsumerInterceptorTest {
 
     Assertions.assertEquals(helloInterceptor.beforeConsume, "value");
     Assertions.assertEquals(helloInterceptor.afterFailed, "value");
+    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 0);
+    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 0);
   }
 
   @Test
@@ -93,6 +86,17 @@ class KafkaConsumerInterceptorTest {
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
     Assertions.assertNotEquals(helloListener.value, "skip");
+    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 0);
+    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 0);
+  }
+
+  @Test
+  void testInterceptorIsSupported() throws InterruptedException {
+    kafkaProducer.sendAndSubscribe(TOPIC_GOODBYE, "key", "value", Schedulers.elastic());
+    Thread.sleep(2_000L); // wait 5 seconds until message received by listener
+
+    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 1);
+    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 1);
   }
 
   @SpringBootApplication
@@ -114,6 +118,16 @@ class KafkaConsumerInterceptorTest {
       return new HelloInterceptor();
     }
 
+    @Bean
+    public GoodByeListener goodByeListener() {
+      return new GoodByeListener();
+    }
+
+    @Bean
+    public CounterInterceptor counterInterceptor() {
+      return new CounterInterceptor();
+    }
+
   }
 
   public static class HelloListener {
@@ -132,6 +146,15 @@ class KafkaConsumerInterceptorTest {
         this.key = record.key();
         this.value = record.value();
       }
+    }
+
+  }
+
+  public static class GoodByeListener {
+
+    @KafkaListener(topics = KafkaConsumerInterceptorTest.TOPIC_GOODBYE, groupId = "goodbye-group")
+    public void onMessage(ConsumerRecord<String, String> record) {
+      // do nothing
     }
 
   }
@@ -170,6 +193,45 @@ class KafkaConsumerInterceptorTest {
     @Override
     public void afterFailedConsume(ConsumerRecord<String, String> consumerRecord, Throwable throwable) {
       this.afterFailed = consumerRecord.value();
+    }
+  }
+
+  public static class CounterInterceptor implements KafkaConsumerInterceptor {
+
+    @Getter
+    private Integer beforeConsume = 0;
+
+    @Getter
+    private Integer afterSuccessConsume = 0;
+
+    @Getter
+    private Integer afterFailedConsume = 0;
+
+    public void reset() {
+      beforeConsume = 0;
+      afterFailedConsume = 0;
+      afterSuccessConsume = 0;
+    }
+
+    @Override
+    public boolean isSupport(Object bean, Method method) {
+      return bean.getClass().isAssignableFrom(GoodByeListener.class);
+    }
+
+    @Override
+    public boolean beforeConsume(ConsumerRecord<String, String> consumerRecord) {
+      beforeConsume++;
+      return false;
+    }
+
+    @Override
+    public void afterSuccessConsume(ConsumerRecord<String, String> consumerRecord) {
+      afterSuccessConsume++;
+    }
+
+    @Override
+    public void afterFailedConsume(ConsumerRecord<String, String> consumerRecord, Throwable throwable) {
+      afterFailedConsume++;
     }
   }
 

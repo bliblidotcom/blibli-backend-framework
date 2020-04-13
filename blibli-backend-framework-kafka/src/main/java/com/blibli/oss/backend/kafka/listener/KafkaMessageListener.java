@@ -10,6 +10,7 @@ import org.springframework.kafka.support.Acknowledgment;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class KafkaMessageListener extends RecordMessagingMessageListenerAdapter<String, String> {
 
@@ -17,7 +18,13 @@ public class KafkaMessageListener extends RecordMessagingMessageListenerAdapter<
 
   public KafkaMessageListener(Object bean, Method method, KafkaListenerErrorHandler errorHandler, List<KafkaConsumerInterceptor> interceptors) {
     super(bean, method, errorHandler);
-    this.interceptors = interceptors;
+    this.interceptors = getSupportedKafkaConsumerInterceptors(bean, method, interceptors);
+  }
+
+  private List<KafkaConsumerInterceptor> getSupportedKafkaConsumerInterceptors(Object bean, Method method, List<KafkaConsumerInterceptor> interceptors) {
+    return interceptors.stream()
+      .filter(interceptor -> interceptor.isSupport(bean, method))
+      .collect(Collectors.toList());
   }
 
   @Override
