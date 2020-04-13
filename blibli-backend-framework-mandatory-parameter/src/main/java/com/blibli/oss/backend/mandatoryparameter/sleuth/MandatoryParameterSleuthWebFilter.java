@@ -2,14 +2,13 @@ package com.blibli.oss.backend.mandatoryparameter.sleuth;
 
 import brave.Span;
 import brave.Tracer;
-import brave.propagation.ExtraFieldPropagation;
 import brave.propagation.TraceContext;
 import com.blibli.oss.backend.mandatoryparameter.helper.ServerHelper;
+import com.blibli.oss.backend.mandatoryparameter.helper.SleuthHelper;
 import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import com.blibli.oss.backend.sleuth.webflux.SleuthWebFilter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
@@ -29,18 +28,12 @@ public class MandatoryParameterSleuthWebFilter implements SleuthWebFilter {
   }
 
   private ServerWebExchange putMandatoryParameterToSleuth(TraceContext traceContext, ServerWebExchange exchange) {
-    putExtraField(traceContext, MandatoryParameterSleuth.STORE_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getStoreId(), properties.getQueryKey().getStoreId()));
-    putExtraField(traceContext, MandatoryParameterSleuth.CLIENT_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getClientId(), properties.getQueryKey().getClientId()));
-    putExtraField(traceContext, MandatoryParameterSleuth.CHANNEL_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getChannelId(), properties.getQueryKey().getChannelId()));
-    putExtraField(traceContext, MandatoryParameterSleuth.REQUEST_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getRequestId(), properties.getQueryKey().getRequestId()));
-    putExtraField(traceContext, MandatoryParameterSleuth.USERNAME, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getUsername(), properties.getQueryKey().getUsername()));
+    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.STORE_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getStoreId(), properties.getQueryKey().getStoreId()));
+    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.CLIENT_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getClientId(), properties.getQueryKey().getClientId()));
+    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.CHANNEL_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getChannelId(), properties.getQueryKey().getChannelId()));
+    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.REQUEST_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getRequestId(), properties.getQueryKey().getRequestId()));
+    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.USERNAME, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getUsername(), properties.getQueryKey().getUsername()));
     return exchange;
-  }
-
-  private void putExtraField(TraceContext traceContext, String name, String value) {
-    if (!StringUtils.isEmpty(value)) {
-      ExtraFieldPropagation.set(traceContext, name, value);
-    }
   }
 
 }
