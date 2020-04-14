@@ -2,10 +2,13 @@ package com.blibli.oss.backend.kafka.interceptor.consumer;
 
 import com.blibli.oss.backend.kafka.interceptor.KafkaConsumerInterceptor;
 import com.blibli.oss.backend.kafka.producer.KafkaProducer;
+import com.blibli.oss.backend.kafka.producer.helper.KafkaHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -46,10 +50,23 @@ class KafkaConsumerInterceptorTest {
   @Autowired
   private CounterInterceptor counterInterceptor;
 
+  @Autowired
+  private EmbeddedKafkaBroker broker;
+
+  private Consumer<String, String> consumer;
+
   @BeforeEach
   void setUp() {
+    consumer = KafkaHelper.newConsumer(broker);
+    broker.consumeFromEmbeddedTopics(consumer, TOPIC);
+
     helloInterceptor.reset();
     counterInterceptor.reset();
+  }
+
+  @AfterEach
+  void tearDown() {
+    consumer.close();
   }
 
   @Test
