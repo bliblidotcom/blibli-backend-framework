@@ -65,8 +65,8 @@ class KafkaConsumerInterceptorTest {
 
     Assertions.assertEquals(helloInterceptor.beforeConsume, "value");
     Assertions.assertEquals(helloInterceptor.afterSuccess, "value");
-    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 0);
-    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 0);
+    Assertions.assertEquals(0, counterInterceptor.getBeforeConsume());
+    Assertions.assertEquals(0, counterInterceptor.getAfterSuccessConsume());
   }
 
   @Test
@@ -76,8 +76,8 @@ class KafkaConsumerInterceptorTest {
 
     Assertions.assertEquals(helloInterceptor.beforeConsume, "value");
     Assertions.assertEquals(helloInterceptor.afterFailed, "value");
-    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 0);
-    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 0);
+    Assertions.assertEquals(0, counterInterceptor.getBeforeConsume());
+    Assertions.assertEquals(0, counterInterceptor.getAfterSuccessConsume());
   }
 
   @Test
@@ -86,17 +86,17 @@ class KafkaConsumerInterceptorTest {
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
     Assertions.assertNotEquals(helloListener.value, "skip");
-    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 0);
-    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 0);
+    Assertions.assertEquals(0, counterInterceptor.getBeforeConsume());
+    Assertions.assertEquals(0, counterInterceptor.getAfterSuccessConsume());
   }
 
   @Test
   void testInterceptorIsSupported() throws InterruptedException {
     kafkaProducer.sendAndSubscribe(TOPIC_GOODBYE, "key", "value", Schedulers.elastic());
-    Thread.sleep(2_000L); // wait 5 seconds until message received by listener
+    Thread.sleep(4_000L); // wait 5 seconds until message received by listener
 
-    Assertions.assertEquals(counterInterceptor.getBeforeConsume(), 1);
-    Assertions.assertEquals(counterInterceptor.getAfterSuccessConsume(), 1);
+    Assertions.assertEquals(1, counterInterceptor.getBeforeConsume());
+    Assertions.assertEquals(1, counterInterceptor.getAfterSuccessConsume());
   }
 
   @SpringBootApplication
