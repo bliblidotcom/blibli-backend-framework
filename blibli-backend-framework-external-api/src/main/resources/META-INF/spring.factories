@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.blibli.oss.backend.externalapi.ExternalApiConfiguration,\
-  com.blibli.oss.backend.externalapi.swagger.ExternalApiSwaggerConfiguration
+  com.blibli.oss.backend.externalapi.swagger.ExternalApiSwaggerConfiguration,\
+  com.blibli.oss.backend.externalapi.sleuth.ExternalApiSleuthConfiguration

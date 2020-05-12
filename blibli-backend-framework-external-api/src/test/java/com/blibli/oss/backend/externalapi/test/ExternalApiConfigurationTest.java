@@ -1,9 +1,11 @@
 package com.blibli.oss.backend.externalapi.test;
 
+import brave.Tracer;
 import com.blibli.oss.backend.common.helper.ResponseHelper;
 import com.blibli.oss.backend.common.model.response.Response;
 import com.blibli.oss.backend.externalapi.annotation.MustMember;
 import com.blibli.oss.backend.externalapi.controller.ExternalApiErrorController;
+import com.blibli.oss.backend.externalapi.helper.ExternalSessionHelper;
 import com.blibli.oss.backend.externalapi.model.ExternalSession;
 import com.blibli.oss.backend.externalapi.properties.ExternalApiProperties;
 import com.blibli.oss.backend.externalapi.swagger.annotation.ExternalSessionAtHeader;
@@ -20,6 +22,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -151,12 +154,35 @@ class ExternalApiConfigurationTest {
       .jsonPath("$.status").isEqualTo(HttpStatus.UNAUTHORIZED.name());
   }
 
+  @Test
+  void testSleuthGuest() {
+    webTestClient.get().uri("/sleuth/guest")
+      .header(properties.getHeader().getUserId(), USER_ID)
+      .header(properties.getHeader().getSessionId(), SESSION_ID)
+      .header(properties.getHeader().getIsMember(), IS_GUEST)
+      .header(properties.getHeader().getAdditionalParameterPrefix() + ADDITIONAL_A, ADDITIONAL_A)
+      .header(properties.getHeader().getAdditionalParameterPrefix() + ADDITIONAL_B, ADDITIONAL_B)
+      .exchange()
+      .expectStatus().is2xxSuccessful()
+      .expectBody()
+      .jsonPath("$.code").isEqualTo(HttpStatus.OK.value())
+      .jsonPath("$.status").isEqualTo(HttpStatus.OK.name())
+      .jsonPath("$.data.userId").isEqualTo(USER_ID)
+      .jsonPath("$.data.sessionId").isEqualTo(SESSION_ID)
+      .jsonPath("$.data.member").isEqualTo(IS_GUEST)
+      .jsonPath("$.data.additionalParameters." + properties.getHeader().getAdditionalParameterPrefix() + ADDITIONAL_A).isEqualTo(ADDITIONAL_A)
+      .jsonPath("$.data.additionalParameters." + properties.getHeader().getAdditionalParameterPrefix() + ADDITIONAL_B).isEqualTo(ADDITIONAL_B);
+  }
+
   @SpringBootApplication
   static class Application {
 
     @MustMember
     @RestController
     static class ExampleController {
+
+      @Autowired
+      private ExampleService exampleService;
 
       @ExternalSessionAtHeader
       @GetMapping(value = "/member", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -181,6 +207,24 @@ class ExternalApiConfigurationTest {
       @GetMapping(value = "/guest", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Response<ExternalSession>> guest(@MustMember(false) ExternalSession externalSession) {
         return Mono.just(ResponseHelper.ok(externalSession));
+      }
+
+      @ExternalSessionAtHeader
+      @GetMapping(value = "/sleuth/guest", produces = MediaType.APPLICATION_JSON_VALUE)
+      public Mono<Response<ExternalSession>> sleuthGuest(@MustMember(false) ExternalSession externalSession) {
+        return Mono.just(ResponseHelper.ok(exampleService.getExternalSession()));
+      }
+
+    }
+
+    @Service
+    static class ExampleService {
+
+      @Autowired
+      private Tracer tracer;
+
+      public ExternalSession getExternalSession() {
+        return ExternalSessionHelper.fromSleuth(tracer.currentSpan().context());
       }
 
     }

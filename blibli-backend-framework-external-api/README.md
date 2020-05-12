@@ -88,3 +88,19 @@ public class ExampleController {
 ```
 
 ## Sleuth Support
+
+If we are using sleuth, we can also get `ExternalSession` from sleuth using `ExternalSessionHelper`.
+
+```java
+@Service
+public class ExampleService {
+
+  @Autowired
+  private Tracer tracer;
+
+  public ExternalSession getExternalSession() {
+    return ExternalSessionHelper.fromSleuth(tracer.currentSpan().context());
+  }
+
+}
+```
