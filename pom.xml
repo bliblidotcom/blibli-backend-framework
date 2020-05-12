@@ -76,6 +76,11 @@
       </dependency>
       <dependency>
         <groupId>com.blibli.oss</groupId>
+        <artifactId>blibli-backend-framework-external-api</artifactId>
+        <version>${blibli-framework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.blibli.oss</groupId>
         <artifactId>blibli-backend-framework-common</artifactId>
         <version>${blibli-framework.version}</version>
       </dependency>

@@ -53,12 +53,12 @@ If you need example project, you can see this repository :
 - [Scheduler Platform](blibli-backend-framework-scheduler-platform/README.md) : api client for scheduler platform
 - [JSON](blibli-backend-framework-json/README.md): simplify json manipulation usage   
 - [Validation](blibli-backend-framework-validation/README.md) : reactive bean validation
-- [Sleuth](blibli-backend-framework-sleuth/README.md) : simplify spring sleuth usage 
+- [Sleuth](blibli-backend-framework-sleuth/README.md) : simplify spring sleuth usage
+- [External API](blibli-backend-framework-external-api/README.md) : helper for external api app 
 
 ## Next Libraries
 
 - Internal API : helper for internal api app
-- External API : helper for external api app
 - Distributed Trace : simplify distributed tracing usage
 - Zipkin : simplify zipkin usage
 - New Relic : simplify new relic usage

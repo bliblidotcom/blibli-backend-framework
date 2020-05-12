@@ -6,6 +6,7 @@ import com.blibli.oss.backend.externalapi.annotation.MustMember;
 import com.blibli.oss.backend.externalapi.controller.ExternalApiErrorController;
 import com.blibli.oss.backend.externalapi.model.ExternalSession;
 import com.blibli.oss.backend.externalapi.properties.ExternalApiProperties;
+import com.blibli.oss.backend.externalapi.swagger.annotation.ExternalSessionAtHeader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -157,23 +158,26 @@ class ExternalApiConfigurationTest {
     @RestController
     static class ExampleController {
 
-
+      @ExternalSessionAtHeader
       @GetMapping(value = "/member", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Response<ExternalSession>> member(@MustMember ExternalSession externalSession) {
         return Mono.just(ResponseHelper.ok(externalSession));
       }
 
+      @ExternalSessionAtHeader
       @MustMember
       @GetMapping(value = "/memberMethod", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Response<ExternalSession>> memberMethod(ExternalSession externalSession) {
         return Mono.just(ResponseHelper.ok(externalSession));
       }
 
+      @ExternalSessionAtHeader
       @GetMapping(value = "/memberClass", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Response<ExternalSession>> memberClass(ExternalSession externalSession) {
         return Mono.just(ResponseHelper.ok(externalSession));
       }
 
+      @ExternalSessionAtHeader
       @GetMapping(value = "/guest", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Response<ExternalSession>> guest(@MustMember(false) ExternalSession externalSession) {
         return Mono.just(ResponseHelper.ok(externalSession));
