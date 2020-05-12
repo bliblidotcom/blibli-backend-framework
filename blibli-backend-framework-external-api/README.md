@@ -68,4 +68,23 @@ public class ExampleController {
 
 ## Swagger Support
 
+To add External Session to swagger, we can use `@ExternalSessionAtHeader` annotation in controller method.
+
+```java
+@RestController
+public class ExampleController {
+  
+  @ExternalSessionAtHeader
+  @GetMapping(value = "/backend/only-member", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<Response<MemberData>> member(@MustMember ExternalSession externalSession) {
+    // do something
+  }
+
+  @ExternalSessionAtHeader
+  @GetMapping(value = "/backend/only-guest", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<Response<GuestData>> guest(@MustMember(false) ExternalSession externalSession) {
+    // do something
+  }
+```
+
 ## Sleuth Support
