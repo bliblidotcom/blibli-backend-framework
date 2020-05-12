@@ -124,15 +124,53 @@ class ExternalApiConfigurationTest {
       .jsonPath("$.status").isEqualTo(HttpStatus.UNAUTHORIZED.name());
   }
 
+  @Test
+  void testMemberButGuestAtMethodLevel() {
+    webTestClient.get().uri("/memberMethod")
+      .header(properties.getHeader().getUserId(), USER_ID)
+      .header(properties.getHeader().getSessionId(), SESSION_ID)
+      .header(properties.getHeader().getIsMember(), IS_GUEST)
+      .exchange()
+      .expectStatus().is4xxClientError()
+      .expectBody()
+      .jsonPath("$.code").isEqualTo(HttpStatus.UNAUTHORIZED.value())
+      .jsonPath("$.status").isEqualTo(HttpStatus.UNAUTHORIZED.name());
+  }
+
+  @Test
+  void testMemberButGuestAtClassLevel() {
+    webTestClient.get().uri("/memberClass")
+      .header(properties.getHeader().getUserId(), USER_ID)
+      .header(properties.getHeader().getSessionId(), SESSION_ID)
+      .header(properties.getHeader().getIsMember(), IS_GUEST)
+      .exchange()
+      .expectStatus().is4xxClientError()
+      .expectBody()
+      .jsonPath("$.code").isEqualTo(HttpStatus.UNAUTHORIZED.value())
+      .jsonPath("$.status").isEqualTo(HttpStatus.UNAUTHORIZED.name());
+  }
+
   @SpringBootApplication
   static class Application {
 
+    @MustMember
     @RestController
     static class ExampleController {
 
 
       @GetMapping(value = "/member", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Response<ExternalSession>> member(@MustMember ExternalSession externalSession) {
+        return Mono.just(ResponseHelper.ok(externalSession));
+      }
+
+      @MustMember
+      @GetMapping(value = "/memberMethod", produces = MediaType.APPLICATION_JSON_VALUE)
+      public Mono<Response<ExternalSession>> memberMethod(ExternalSession externalSession) {
+        return Mono.just(ResponseHelper.ok(externalSession));
+      }
+
+      @GetMapping(value = "/memberClass", produces = MediaType.APPLICATION_JSON_VALUE)
+      public Mono<Response<ExternalSession>> memberClass(ExternalSession externalSession) {
         return Mono.just(ResponseHelper.ok(externalSession));
       }
 
