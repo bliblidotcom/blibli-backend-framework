@@ -17,6 +17,7 @@
     <module>blibli-backend-framework-json</module>
     <module>blibli-backend-framework-validation</module>
     <module>blibli-backend-framework-sleuth</module>
+      <module>blibli-backend-framework-external-api</module>
   </modules>
 
   <parent>
