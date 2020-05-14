@@ -8,7 +8,7 @@ Scheduler Platform is event based using Apache Kafka. This module is client sdk 
 ```xml
 <dependency>
   <groupId>com.blibli.oss</groupId>
-  <artifactId>blibli-backend-framework-aggregate-query</artifactId>
+  <artifactId>blibli-backend-framework-scheduler-platform</artifactId>
 </dependency>
 ```
 
