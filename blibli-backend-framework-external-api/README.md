@@ -104,3 +104,25 @@ public class ExampleService {
 
 }
 ```
+
+## Exception Handler
+
+When we get invalid external session, this module will throw `ExternalApiException`, you need to create `RestControllerAdvice` 
+to translate the exception to your custom response. Or we can use `ExternalApiErrorController`, this will automatic translate
+`ExternalApiException` to 401 Unauthorized response
+
+```java
+@Slf4j
+@RestControllerAdvice
+static class ErrorController implements ExternalApiErrorController, MessageSourceAware {
+
+  @Getter
+  @Setter
+  private MessageSource messageSource;
+
+  @Override
+  public Logger getLogger() {
+    return log;
+  }
+}
+```
