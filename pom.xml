@@ -18,6 +18,7 @@
     <module>blibli-backend-framework-validation</module>
     <module>blibli-backend-framework-sleuth</module>
     <module>blibli-backend-framework-external-api</module>
+    <module>blibli-backend-framework-job</module>
   </modules>
 
   <parent>
@@ -112,6 +113,11 @@
       <dependency>
         <groupId>com.blibli.oss</groupId>
         <artifactId>blibli-backend-framework-version</artifactId>
+        <version>${blibli-framework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.blibli.oss</groupId>
+        <artifactId>blibli-backend-framework-job</artifactId>
         <version>${blibli-framework.version}</version>
       </dependency>
       <dependency>
