@@ -55,11 +55,4 @@ If you need example project, you can see this repository :
 - [Validation](blibli-backend-framework-validation/README.md) : reactive bean validation
 - [Sleuth](blibli-backend-framework-sleuth/README.md) : simplify spring sleuth usage
 - [External API](blibli-backend-framework-external-api/README.md) : helper for external api app 
-
-## Next Libraries
-
-- Internal API : helper for internal api app
-- Distributed Trace : simplify distributed tracing usage
-- Zipkin : simplify zipkin usage
-- New Relic : simplify new relic usage
-- Log : api client for log platform
+- [Internal API](blibli-backend-framework-internal-api/README.md) : helper for internal api app
