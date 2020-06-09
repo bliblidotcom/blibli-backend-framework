@@ -1,8 +1,10 @@
 package com.blibli.oss.backend.internalapi;
 
+import brave.Tracer;
 import com.blibli.oss.backend.common.helper.ResponseHelper;
 import com.blibli.oss.backend.common.model.response.Response;
 import com.blibli.oss.backend.common.webflux.controller.CommonErrorController;
+import com.blibli.oss.backend.internalapi.helper.InternalSessionHelper;
 import com.blibli.oss.backend.internalapi.model.InternalSession;
 import com.blibli.oss.backend.internalapi.properties.InternalApiProperties;
 import com.blibli.oss.backend.internalapi.swagger.annotation.InternalSessionAtHeader;
@@ -19,6 +21,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,16 +64,54 @@ public class InternalApiConfigurationTest {
       .jsonPath("$.data.roles[1]").isEqualTo(ROLE_2);
   }
 
+  @Test
+  void testInternalSessionSleuth() {
+    webTestClient.get().uri("/internal-session-sleuth")
+      .header(properties.getHeader().getUserId(), USER_ID)
+      .header(properties.getHeader().getUserName(), USER_NAME)
+      .header(properties.getHeader().getRoles(), ROLE_1 + "," + ROLE_2)
+      .exchange()
+      .expectStatus().is2xxSuccessful()
+      .expectBody()
+      .jsonPath("$.code").isEqualTo(HttpStatus.OK.value())
+      .jsonPath("$.status").isEqualTo(HttpStatus.OK.name())
+      .jsonPath("$.data.userId").isEqualTo(USER_ID)
+      .jsonPath("$.data.userName").isEqualTo(USER_NAME)
+      .jsonPath("$.data.roles[0]").isEqualTo(ROLE_1)
+      .jsonPath("$.data.roles[1]").isEqualTo(ROLE_2);
+  }
+
   @SpringBootApplication
   public static class Application {
 
     @RestController
     public static class TestController {
 
+      @Autowired
+      private TestService testService;
+
       @InternalSessionAtHeader
       @GetMapping(path = "/internal-session", produces = MediaType.APPLICATION_JSON_VALUE)
       public Mono<Response<InternalSession>> internalSession(InternalSession internalSession) {
         return Mono.just(ResponseHelper.ok(internalSession));
+      }
+
+      @InternalSessionAtHeader
+      @GetMapping(path = "/internal-session-sleuth", produces = MediaType.APPLICATION_JSON_VALUE)
+      public Mono<Response<InternalSession>> internalSessionSleuth(InternalSession internalSession) {
+        return Mono.just(ResponseHelper.ok(testService.getInternalSession()));
+      }
+
+    }
+
+    @Service
+    public static class TestService {
+
+      @Autowired
+      private Tracer tracer;
+
+      public InternalSession getInternalSession() {
+        return InternalSessionHelper.fromSleuth(tracer.currentSpan().context());
       }
 
     }

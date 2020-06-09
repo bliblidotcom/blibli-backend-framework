@@ -45,7 +45,7 @@ public class InternalSessionHelper {
 
     StringJoiner stringJoiner = new StringJoiner(",");
     externalSession.getRoles().forEach(stringJoiner::add);
-    ExtraFieldPropagation.set(traceContext, InternalSessionSleuth.USER_NAME, stringJoiner.toString());
+    ExtraFieldPropagation.set(traceContext, InternalSessionSleuth.ROLES, stringJoiner.toString());
 
     return externalSession;
   }
