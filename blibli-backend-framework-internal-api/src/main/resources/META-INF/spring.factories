@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.blibli.oss.backend.internalapi.InternalApiConfiguration,\
-  com.blibli.oss.backend.internalapi.swagger.InternalApiSwaggerConfiguration
+  com.blibli.oss.backend.internalapi.swagger.InternalApiSwaggerConfiguration,\
+  com.blibli.oss.backend.internalapi.sleuth.InternalApiSleuthConfiguration
