@@ -341,6 +341,10 @@ or using properties :
 blibli.backend.apiclient.configs.exampleApiClient.codec-customizers[0]=com.blibli.oss.backend.example.client.customizer.ExampleCodecCustomizer
 ```
 
+## Circuit Breaker
+
+// TODO write this
+
 ## Supported Body
 
 API Client Module is modular library, it support request body resolver to translate from `@RequestBody` parameter to low level http request.

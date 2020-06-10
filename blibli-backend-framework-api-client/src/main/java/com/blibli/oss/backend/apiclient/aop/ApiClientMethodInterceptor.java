@@ -13,6 +13,7 @@ import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
 import com.blibli.oss.backend.apiclient.interceptor.GlobalApiClientInterceptor;
 import com.blibli.oss.backend.reactor.scheduler.SchedulerHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -21,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
+import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.ParameterizedTypeReference;
@@ -70,6 +74,8 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
 
   private WebClient webClient;
 
+  private ReactiveCircuitBreaker circuitBreaker;
+
   private ApiClientFallback apiClientFallback;
 
   private RequestMappingMetadata metadata;
@@ -81,11 +87,25 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   @Override
   public void afterPropertiesSet() throws Exception {
     prepareAttribute();
+    prepareCircuitBreaker();
     prepareWebClient();
     prepareFallback();
     prepareBodyResolvers();
     prepareErrorResolver();
     prepareScheduler();
+  }
+
+  private void prepareCircuitBreaker() {
+    ReactiveResilience4JCircuitBreakerFactory factory = applicationContext.getBean(ReactiveResilience4JCircuitBreakerFactory.class);
+
+    // TODO create config based on ApiClientProperties.circuitBreaker
+    CircuitBreakerConfig config = CircuitBreakerConfig.custom()
+        .slidingWindow(2, 2, CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+        .build();
+    factory.configure(resilience4JConfigBuilder -> resilience4JConfigBuilder
+        .circuitBreakerConfig(config).build(), name);
+
+    circuitBreaker = factory.create(name);
   }
 
   private void prepareAttribute() {
@@ -243,13 +263,15 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
       .map(client -> getUriBuilder(methodName, arguments, client))
       .map(client -> doHeader(client, methodName, arguments))
       .map(client -> doBody(client, method, methodName, arguments))
-      .flatMap(client -> doResponse(client, methodName))
-      .onErrorResume(throwable -> doFallback((Throwable) throwable, method, arguments));
+      .flatMap(client -> doResponse(client, methodName));
+
+    Mono circuitBreakerWrapping = circuitBreaker.run(
+        mono, (throwable -> doFallback(throwable, method, arguments)));
 
     if (Objects.nonNull(scheduler)) {
-      return mono.subscribeOn(scheduler);
+      return circuitBreakerWrapping.subscribeOn(scheduler);
     } else {
-      return mono;
+      return circuitBreakerWrapping;
     }
   }
 
