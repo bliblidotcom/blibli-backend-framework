@@ -1,5 +1,7 @@
 package com.blibli.oss.backend.common.webflux.controller;
 
+import com.blibli.oss.backend.common.annotation.MetaData;
+import com.blibli.oss.backend.common.annotation.MetaDatas;
 import com.blibli.oss.backend.common.model.response.Response;
 import org.slf4j.Logger;
 import org.springframework.context.MessageSource;
@@ -16,6 +18,7 @@ import org.springframework.web.server.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
+import java.lang.reflect.Field;
 import java.util.*;
 
 public interface CommonErrorController {
@@ -81,6 +84,7 @@ public interface CommonErrorController {
     response.setCode(HttpStatus.BAD_REQUEST.value());
     response.setStatus(HttpStatus.BAD_REQUEST.name());
     response.setErrors(from(e.getConstraintViolations()));
+    response.setMetadata(Collections.singletonMap("errors", getMetaData(e.getConstraintViolations())));
 
     return ResponseEntity.badRequest().body(response);
   }
@@ -217,6 +221,40 @@ public interface CommonErrorController {
     });
 
     return new String[]{builder.toString()};
+  }
+
+  default Map<String, Map<String, String>> getMetaData(Set<ConstraintViolation<?>> constraintViolations) {
+    Map<String, Map<String, String>> metadata = new HashMap<>();
+    constraintViolations.forEach(violation -> {
+      try {
+        Class<?> beanClass = violation.getLeafBean().getClass();
+
+        String field = "";
+        for (Path.Node node : violation.getPropertyPath()) {
+          field = node.getName();
+        }
+
+        Field declaredField = beanClass.getDeclaredField(field);
+        MetaDatas metaDatas = declaredField.getAnnotation(MetaDatas.class);
+
+        if (metaDatas != null) {
+          Map<String, String> values = new HashMap<>();
+
+          for (MetaData metaData : metaDatas.value()) {
+            values.put(metaData.key(), metaData.value());
+          }
+
+          for (String attribute : getAttributes(violation)) {
+            metadata.put(attribute, values);
+          }
+        }
+
+      } catch (Throwable throwable) {
+        getLogger().warn(throwable.getMessage(), throwable);
+      }
+    });
+
+    return metadata;
   }
 
 }
