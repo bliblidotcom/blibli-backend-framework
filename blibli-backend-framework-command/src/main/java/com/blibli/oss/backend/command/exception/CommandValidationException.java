@@ -5,6 +5,11 @@ import lombok.Getter;
 import javax.validation.ConstraintViolation;
 import java.util.Set;
 
+/**
+ * @deprecated not used anymore
+ * @see javax.validation.ConstraintViolationException
+ */
+@Deprecated
 public class CommandValidationException extends CommandRuntimeException {
 
   @Getter

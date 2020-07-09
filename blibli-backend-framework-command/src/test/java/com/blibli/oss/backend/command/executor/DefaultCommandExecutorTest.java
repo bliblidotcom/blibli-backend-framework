@@ -1,7 +1,6 @@
 package com.blibli.oss.backend.command.executor;
 
 import com.blibli.oss.backend.command.Command;
-import com.blibli.oss.backend.command.exception.CommandValidationException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotBlank;
 
 @ExtendWith(SpringExtension.class)
@@ -42,7 +42,7 @@ public class DefaultCommandExecutorTest {
   @Test
   void testValidationError() {
     StepVerifier.create(commandExecutor.execute(HelloCommand.class, HelloCommandRequest.builder().name("").build()))
-      .expectError(CommandValidationException.class)
+      .expectError(ConstraintViolationException.class)
       .verify();
   }
 
