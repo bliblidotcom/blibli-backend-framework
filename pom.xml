@@ -19,6 +19,7 @@
     <module>blibli-backend-framework-sleuth</module>
     <module>blibli-backend-framework-external-api</module>
     <module>blibli-backend-framework-internal-api</module>
+    <module>blibli-backend-framework-newrelic</module>
   </modules>
 
   <parent>
@@ -43,6 +44,7 @@
     <embedded.redis.version>0.6</embedded.redis.version>
     <wiremock.version>2.26.3</wiremock.version>
     <elasticsearch.version>6.4.0</elasticsearch.version>
+    <newrelic-api.version>5.0.0</newrelic-api.version>
   </properties>
 
   <dependencyManagement>
@@ -136,9 +138,19 @@
         <version>${blibli-framework.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.blibli.oss</groupId>
+        <artifactId>blibli-backend-framework-newrelic</artifactId>
+        <version>${blibli-framework.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.springdoc</groupId>
         <artifactId>springdoc-openapi-webflux-ui</artifactId>
         <version>${springdoc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.newrelic.agent.java</groupId>
+        <artifactId>newrelic-api</artifactId>
+        <version>${newrelic-api.version}</version>
       </dependency>
       <dependency>
         <groupId>com.github.tomakehurst</groupId>
