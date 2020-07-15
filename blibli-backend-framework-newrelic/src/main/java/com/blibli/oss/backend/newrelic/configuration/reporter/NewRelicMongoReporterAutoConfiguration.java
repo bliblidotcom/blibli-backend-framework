@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 
 @Configuration
-@ConditionalOnClass({NewRelicMongoReporter.class, MongoProperties.class, ReactiveMongoTemplate.class})
+@ConditionalOnClass({MongoProperties.class, ReactiveMongoTemplate.class})
 @Slf4j
 @Import({ReactiveMongoDbAspect.class})
 public class NewRelicMongoReporterAutoConfiguration {

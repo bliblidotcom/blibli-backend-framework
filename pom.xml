@@ -44,7 +44,7 @@
     <embedded.redis.version>0.6</embedded.redis.version>
     <wiremock.version>2.26.3</wiremock.version>
     <elasticsearch.version>6.4.0</elasticsearch.version>
-    <newrelic-api.version>5.0.0</newrelic-api.version>
+    <newrelic-api.version>5.11.0</newrelic-api.version>
   </properties>
 
   <dependencyManagement>

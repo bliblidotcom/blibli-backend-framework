@@ -1,4 +1,4 @@
-# newrelic-reactor-plugin
+# Reactor New Relic Instrumentation
 
 A plugin to enable new relic instrumentation in Spring Boot 2 Webflux App.
 
@@ -19,7 +19,6 @@ Planned future modules:
     <dependency>
         <groupId>com.blibli.oss</groupId>
         <artifactId>blibli-backend-framework-newrelic</artifactId>
-        <version>0.1.0</version> <!-- check latest version first! -->
     </dependency>
     ```
 
@@ -28,21 +27,6 @@ Planned future modules:
     ```java
     @SpringBootApplication
     @EnableNewRelicReactorInstrumentation
-    public class MySpringbootWebfluxApplication {
-    
-        public static void main(String[] args) {
-          SpringApplication.run(MySpringbootWebfluxApplication.class, args);
-        }
-    
-    }
-    ```
-
-2. Add `@NewRelicMongoReporter` annotation to enable reactive mongo instrumentation as well.
-    
-    ```java
-    @SpringBootApplication
-    @EnableNewRelicReactorInstrumentation
-    @NewRelicMongoReporter
     public class MySpringbootWebfluxApplication {
     
         public static void main(String[] args) {
