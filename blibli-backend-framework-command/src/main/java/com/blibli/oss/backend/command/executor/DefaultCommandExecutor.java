@@ -1,7 +1,6 @@
 package com.blibli.oss.backend.command.executor;
 
 import com.blibli.oss.backend.command.Command;
-import com.blibli.oss.backend.command.exception.CommandValidationException;
 import com.blibli.oss.backend.command.interceptor.CommandInterceptor;
 import com.blibli.oss.backend.command.interceptor.InterceptorUtil;
 import lombok.Setter;
@@ -12,6 +11,7 @@ import org.springframework.context.ApplicationContextAware;
 import reactor.core.publisher.Mono;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.util.List;
 import java.util.Set;
@@ -43,9 +43,9 @@ public class DefaultCommandExecutor implements CommandExecutor, ApplicationConte
     if (command.validateRequest()) validateAndThrownIfInvalid(request);
   }
 
-  private <R> void validateAndThrownIfInvalid(R request) throws CommandValidationException {
+  private <R> void validateAndThrownIfInvalid(R request) throws ConstraintViolationException {
     Set<ConstraintViolation<R>> constraintViolations = validator.validate(request);
-    if (!constraintViolations.isEmpty()) throw new CommandValidationException(constraintViolations);
+    if (!constraintViolations.isEmpty()) throw new ConstraintViolationException(constraintViolations);
   }
 
   private <R, T> Mono<T> doExecute(Command<R, T> command, R request) {

@@ -50,6 +50,11 @@ public class Response<T> {
    */
   private Map<String, List<String>> errors;
 
+  /**
+   * Metadata information
+   */
+  private Map<String, Object> metadata;
+
 }
 ```
 
@@ -170,5 +175,46 @@ public class CustomerController {
     // some logic
   }
 
+}
+```
+
+## Metadata Information for Validation
+
+Sometimes we want to send metadata information for UI in validation message. We can do this with add @MetaDatas on validation field
+
+```java
+public class SampleRequest {
+
+      @NotBlank(message = "NotBlank")
+      private String name;
+
+      @MetaDatas(
+        @MetaData(key = "min", value = "1"),
+        @MetaData(key = "max", value = "100")
+      )
+      @Min(1)
+      @Max(100)
+      private Integer age;
+```
+
+When get validation error, response will automatically contains metadata 
+
+```json
+{
+  "code" : 400,
+  "status" : "BAD_REQUEST",
+  "errors" : {
+    "age" : [
+      "TooLarge"
+    ] 
+  },
+  "metadata" : {
+    "errors" : {
+      "age" : {
+        "min" : "1",
+        "max" : "100"
+      } 
+    }
+  }
 }
 ```
