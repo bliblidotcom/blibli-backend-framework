@@ -2,7 +2,6 @@ package com.blibli.oss.backend.newrelic;
 
 import com.blibli.oss.backend.command.Command;
 import com.blibli.oss.backend.command.executor.CommandExecutor;
-import com.blibli.oss.backend.newrelic.configuration.EnableNewRelicReactorInstrumentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,7 +23,6 @@ import java.util.Map;
     MongoAutoConfiguration.class,
     MongoDataAutoConfiguration.class
 })
-@EnableNewRelicReactorInstrumentation
 public class TestApplication {
 
   public static void main(String[] args) {
