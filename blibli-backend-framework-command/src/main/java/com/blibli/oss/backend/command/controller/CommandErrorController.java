@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 public interface CommandErrorController extends CommonErrorController {
 
+  /**
+   * @deprecated not used anymore
+   * @see javax.validation.ConstraintViolationException
+   */
+  @Deprecated
   @ExceptionHandler(CommandValidationException.class)
   default ResponseEntity<Response<Object>> commandValidationException(CommandValidationException e) {
     getLogger().warn(CommandValidationException.class.getName(), e);

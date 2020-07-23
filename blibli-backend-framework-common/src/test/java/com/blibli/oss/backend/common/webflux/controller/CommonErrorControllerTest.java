@@ -1,5 +1,7 @@
 package com.blibli.oss.backend.common.webflux.controller;
 
+import com.blibli.oss.backend.common.annotation.MetaData;
+import com.blibli.oss.backend.common.annotation.MetaDatas;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -24,8 +26,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.server.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -129,6 +136,23 @@ public class CommonErrorControllerTest {
       .expectStatus().isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
+  @Test
+  void testMetadataException() {
+    webTestClient.get()
+      .uri("/MetadataException")
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST)
+      .expectBody()
+      .jsonPath("$.errors.name").isEqualTo("NotBlank")
+      .jsonPath("$.errors.age").isEqualTo("NotNull")
+      .jsonPath("$.errors['nested.name']").isEqualTo("NotBlank")
+      .jsonPath("$.errors['nested.age']").isEqualTo("NotNull")
+      .jsonPath("$.metadata.errors['name'].message").isEqualTo("NotBlank")
+      .jsonPath("$.metadata.errors['age'].message").isEqualTo("NotNull")
+      .jsonPath("$.metadata.errors['nested.name'].message").isEqualTo("NotBlank")
+      .jsonPath("$.metadata.errors['nested.age'].message").isEqualTo("NotNull");
+  }
+
   @SpringBootApplication
   public static class Application {
 
@@ -137,6 +161,9 @@ public class CommonErrorControllerTest {
 
       @Autowired
       private ExampleService exampleService;
+
+      @Autowired
+      private Validator validator;
 
       @GetMapping("/Throwable")
       public String throwable() throws Throwable {
@@ -195,6 +222,64 @@ public class CommonErrorControllerTest {
       public String serverErrorException() {
         throw new ServerErrorException("Ups", new NullPointerException());
       }
+
+      @GetMapping("/MetadataException")
+      public String metadataValidation(){
+        SampleRequest sampleRequest = SampleRequest.builder()
+          .name("")
+          .age(null)
+          .nested(NestedSampleRequest.builder()
+            .name("")
+            .age(null)
+            .build())
+          .build();
+
+        Set<ConstraintViolation<SampleRequest>> constraintViolations = validator.validate(sampleRequest);
+        throw new ConstraintViolationException(constraintViolations);
+      }
+
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SampleRequest {
+
+      @MetaDatas(
+        @MetaData(key = "message", value = "NotBlank")
+      )
+      @NotBlank(message = "NotBlank")
+      private String name;
+
+      @MetaDatas(
+        @MetaData(key = "message", value = "NotNull")
+      )
+      @NotNull(message = "NotNull")
+      private Integer age;
+
+      @Valid
+      private NestedSampleRequest nested;
+
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class NestedSampleRequest {
+
+      @MetaDatas(
+        @MetaData(key = "message", value = "NotBlank")
+      )
+      @NotBlank(message = "NotBlank")
+      private String name;
+
+      @MetaDatas(
+        @MetaData(key = "message", value = "NotNull")
+      )
+      @NotNull(message = "NotNull")
+      private Integer age;
 
     }
 
