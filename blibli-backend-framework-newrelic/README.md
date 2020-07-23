@@ -22,20 +22,6 @@ Planned future modules:
     </dependency>
     ```
 
-2. Add `@EnableNewRelicReactorInstrumentation` annotation to enable instrumentation in the main app.
-    
-    ```java
-    @SpringBootApplication
-    @EnableNewRelicReactorInstrumentation
-    public class MySpringbootWebfluxApplication {
-    
-        public static void main(String[] args) {
-          SpringApplication.run(MySpringbootWebfluxApplication.class, args);
-        }
-    
-    }
-    ```
-
 And viola! See your app instrumented in New Relic.
 
 ![New Relic instrumentation](docs/newrelic-sample.png)
