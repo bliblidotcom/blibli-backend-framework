@@ -93,7 +93,7 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
   }
 
   private void prepareWebClient() {
-    WebClient.Builder builder = WebClient.builder()
+    WebClient.Builder builder = applicationContext.getBean(WebClient.Builder.class)
       .exchangeStrategies(getExchangeStrategies())
       .baseUrl(metadata.getProperties().getUrl())
       .clientConnector(new ReactorClientHttpConnector(HttpClient.from(getTcpClient())))
