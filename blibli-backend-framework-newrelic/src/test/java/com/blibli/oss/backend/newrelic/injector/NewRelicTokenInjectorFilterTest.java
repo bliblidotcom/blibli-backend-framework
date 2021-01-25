@@ -5,6 +5,7 @@ import com.newrelic.api.agent.Token;
 import com.newrelic.api.agent.TracedMethod;
 import com.newrelic.api.agent.Transaction;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -17,8 +18,6 @@ import reactor.util.context.Context;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -74,16 +73,16 @@ public class NewRelicTokenInjectorFilterTest {
   public void getToken() {
     Context ctx = Context.of(NewRelicTokenInjectorFilter.TRANSACTION_CONTEXT_KEY, transaction, NewRelicTokenInjectorFilter.TOKEN_CONTEXT_KEY, token);
     final Optional<Token> actual = NewRelicTokenInjectorFilter.getToken(ctx);
-    assertTrue(actual.isPresent());
-    assertEquals(token, actual.get());
+    Assertions.assertTrue(actual.isPresent());
+    Assertions.assertEquals(token, actual.get());
   }
 
   @Test
   public void getTransaction() {
     Context ctx = Context.of(NewRelicTokenInjectorFilter.TRANSACTION_CONTEXT_KEY, transaction, NewRelicTokenInjectorFilter.TOKEN_CONTEXT_KEY, token);
     final Optional<Transaction> actual = NewRelicTokenInjectorFilter.getTransaction(ctx);
-    assertTrue(actual.isPresent());
-    assertEquals(transaction, actual.get());
+    Assertions.assertTrue(actual.isPresent());
+    Assertions.assertEquals(transaction, actual.get());
   }
 
   @AfterEach

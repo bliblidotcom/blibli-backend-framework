@@ -1,6 +1,6 @@
 package com.blibli.oss.backend.internalapi.helper;
 
-import brave.propagation.ExtraFieldPropagation;
+import brave.baggage.BaggageField;
 import brave.propagation.TraceContext;
 import com.blibli.oss.backend.internalapi.model.InternalSession;
 import com.blibli.oss.backend.internalapi.properties.InternalApiProperties;
@@ -33,19 +33,19 @@ public class InternalSessionHelper {
 
   public static InternalSession fromSleuth(TraceContext traceContext) {
     return InternalSession.builder()
-      .userId(ExtraFieldPropagation.get(traceContext, InternalSessionSleuth.USER_ID))
-      .userName(ExtraFieldPropagation.get(traceContext, InternalSessionSleuth.USER_NAME))
-      .roles(getRoles(ExtraFieldPropagation.get(traceContext, InternalSessionSleuth.ROLES)))
+      .userId(BaggageField.getByName(traceContext, InternalSessionSleuth.USER_ID).getValue(traceContext))
+      .userName(BaggageField.getByName(traceContext, InternalSessionSleuth.USER_NAME).getValue(traceContext))
+      .roles(getRoles(BaggageField.getByName(traceContext, InternalSessionSleuth.ROLES).getValue(traceContext)))
       .build();
   }
 
   public static InternalSession toSleuth(TraceContext traceContext, InternalSession externalSession) {
-    ExtraFieldPropagation.set(traceContext, InternalSessionSleuth.USER_ID, externalSession.getUserId());
-    ExtraFieldPropagation.set(traceContext, InternalSessionSleuth.USER_NAME, externalSession.getUserName());
+    BaggageField.getByName(traceContext, InternalSessionSleuth.USER_ID).updateValue(traceContext, externalSession.getUserId());
+    BaggageField.getByName(traceContext, InternalSessionSleuth.USER_NAME).updateValue(traceContext, externalSession.getUserName());
 
     StringJoiner stringJoiner = new StringJoiner(",");
     externalSession.getRoles().forEach(stringJoiner::add);
-    ExtraFieldPropagation.set(traceContext, InternalSessionSleuth.ROLES, stringJoiner.toString());
+    BaggageField.getByName(traceContext, InternalSessionSleuth.ROLES).updateValue(traceContext, stringJoiner.toString());
 
     return externalSession;
   }

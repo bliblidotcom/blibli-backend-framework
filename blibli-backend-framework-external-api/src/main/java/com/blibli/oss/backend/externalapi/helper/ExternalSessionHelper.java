@@ -1,6 +1,6 @@
 package com.blibli.oss.backend.externalapi.helper;
 
-import brave.propagation.ExtraFieldPropagation;
+import brave.baggage.BaggageField;
 import brave.propagation.TraceContext;
 import com.blibli.oss.backend.externalapi.model.ExternalSession;
 import com.blibli.oss.backend.externalapi.properties.ExternalApiProperties;
@@ -28,11 +28,11 @@ public class ExternalSessionHelper {
 
   public static ExternalSession fromSleuth(TraceContext traceContext) {
     ExternalSession.ExternalSessionBuilder builder = ExternalSession.builder()
-      .userId(ExtraFieldPropagation.get(traceContext, ExternalSessionSleuth.USER_ID))
-      .sessionId(ExtraFieldPropagation.get(traceContext, ExternalSessionSleuth.SESSION_ID))
-      .member(Boolean.parseBoolean(ExtraFieldPropagation.get(traceContext, ExternalSessionSleuth.IS_MEMBER)));
+      .userId(BaggageField.getByName(traceContext, ExternalSessionSleuth.USER_ID).getValue(traceContext))
+      .sessionId(BaggageField.getByName(traceContext, ExternalSessionSleuth.SESSION_ID).getValue(traceContext))
+      .member(Boolean.parseBoolean(BaggageField.getByName(traceContext, ExternalSessionSleuth.IS_MEMBER).getValue(traceContext)));
 
-    String additionalParameters = ExtraFieldPropagation.get(traceContext, ExternalSessionSleuth.ADDITIONAL_PARAMETERS);
+    String additionalParameters = BaggageField.getByName(traceContext, ExternalSessionSleuth.ADDITIONAL_PARAMETERS).getValue(traceContext);
     if (Objects.nonNull(additionalParameters)) {
       String[] split = additionalParameters.split("\n");
       for (String pair : split) {
@@ -45,16 +45,16 @@ public class ExternalSessionHelper {
   }
 
   public static ExternalSession toSleuth(TraceContext traceContext, ExternalSession externalSession) {
-    ExtraFieldPropagation.set(traceContext, ExternalSessionSleuth.USER_ID, externalSession.getUserId());
-    ExtraFieldPropagation.set(traceContext, ExternalSessionSleuth.SESSION_ID, externalSession.getSessionId());
-    ExtraFieldPropagation.set(traceContext, ExternalSessionSleuth.IS_MEMBER, String.valueOf(externalSession.isMember()));
+    BaggageField.getByName(traceContext, ExternalSessionSleuth.USER_ID).updateValue(traceContext, externalSession.getUserId());
+    BaggageField.getByName(traceContext, ExternalSessionSleuth.SESSION_ID).updateValue(traceContext, externalSession.getSessionId());
+    BaggageField.getByName(traceContext, ExternalSessionSleuth.IS_MEMBER).updateValue(traceContext, String.valueOf(externalSession.isMember()));
 
     if (!externalSession.getAdditionalParameters().isEmpty()) {
       StringBuilder builder = new StringBuilder();
       externalSession.getAdditionalParameters().forEach((key, value) -> {
         builder.append(key).append("=").append(value).append("\n");
       });
-      ExtraFieldPropagation.set(traceContext, ExternalSessionSleuth.ADDITIONAL_PARAMETERS, builder.toString());
+      BaggageField.getByName(traceContext, ExternalSessionSleuth.ADDITIONAL_PARAMETERS).updateValue(traceContext, builder.toString());
     }
 
     return externalSession;

@@ -1,14 +1,13 @@
 package com.blibli.oss.backend.mandatoryparameter.sleuth;
 
-import brave.Span;
-import brave.Tracer;
-import brave.propagation.TraceContext;
 import com.blibli.oss.backend.mandatoryparameter.helper.ServerHelper;
-import com.blibli.oss.backend.mandatoryparameter.helper.SleuthHelper;
 import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import com.blibli.oss.backend.sleuth.webflux.SleuthWebFilter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.TraceContext;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
@@ -28,11 +27,11 @@ public class MandatoryParameterSleuthWebFilter implements SleuthWebFilter {
   }
 
   private ServerWebExchange putMandatoryParameterToSleuth(TraceContext traceContext, ServerWebExchange exchange) {
-    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.STORE_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getStoreId(), properties.getQueryKey().getStoreId()));
-    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.CLIENT_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getClientId(), properties.getQueryKey().getClientId()));
-    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.CHANNEL_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getChannelId(), properties.getQueryKey().getChannelId()));
-    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.REQUEST_ID, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getRequestId(), properties.getQueryKey().getRequestId()));
-    SleuthHelper.putExtraField(traceContext, MandatoryParameterSleuth.USERNAME, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getUsername(), properties.getQueryKey().getUsername()));
+    tracer.createBaggage(MandatoryParameterSleuth.STORE_ID).set(traceContext, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getStoreId(), properties.getQueryKey().getStoreId()));
+    tracer.createBaggage(MandatoryParameterSleuth.CLIENT_ID).set(traceContext, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getClientId(), properties.getQueryKey().getClientId()));
+    tracer.createBaggage(MandatoryParameterSleuth.CHANNEL_ID).set(traceContext, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getChannelId(), properties.getQueryKey().getChannelId()));
+    tracer.createBaggage(MandatoryParameterSleuth.REQUEST_ID).set(traceContext, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getRequestId(), properties.getQueryKey().getRequestId()));
+    tracer.createBaggage(MandatoryParameterSleuth.USERNAME).set(traceContext, ServerHelper.getValueFromQueryOrHeader(exchange, properties.getHeaderKey().getUsername(), properties.getQueryKey().getUsername()));
     return exchange;
   }
 

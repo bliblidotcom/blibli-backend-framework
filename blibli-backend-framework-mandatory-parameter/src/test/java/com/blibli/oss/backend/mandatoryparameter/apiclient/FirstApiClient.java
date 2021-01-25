@@ -1,4 +1,4 @@
-package com.blibli.oss.backend.mandatoryparameter.apiclient.apiclient;
+package com.blibli.oss.backend.mandatoryparameter.apiclient;
 
 import com.blibli.oss.backend.apiclient.annotation.ApiClient;
 import org.springframework.http.MediaType;
