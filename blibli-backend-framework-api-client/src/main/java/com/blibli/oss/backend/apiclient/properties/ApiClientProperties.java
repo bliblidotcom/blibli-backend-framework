@@ -5,6 +5,7 @@ import com.blibli.oss.backend.apiclient.customizer.ApiClientTcpClientCustomizer;
 import com.blibli.oss.backend.apiclient.customizer.ApiClientWebClientCustomizer;
 import com.blibli.oss.backend.apiclient.error.ApiErrorResolver;
 import com.blibli.oss.backend.apiclient.interceptor.ApiClientInterceptor;
+import io.github.resilience4j.common.circuitbreaker.configuration.CircuitBreakerConfigurationProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -77,6 +78,8 @@ public class ApiClientProperties {
     private List<Class<? extends ApiClientTcpClientCustomizer>> tcpClientCustomizers = new ArrayList<>();
 
     private Class<? extends ApiErrorResolver> errorResolver;
+
+    private CircuitBreakerConfigurationProperties.InstanceProperties circuitBreaker;
 
   }
 
