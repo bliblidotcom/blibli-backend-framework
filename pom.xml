@@ -162,9 +162,9 @@
 
   <distributionManagement>
     <repository>
-      <id>bintray-bliblidotcom-maven</id>
-      <name>bliblidotcom-maven</name>
-      <url>https://api.bintray.com/maven/bliblidotcom/maven/blibli-backend-framework/;publish=1</url>
+      <id>github</id>
+      <name>GitHub OWNER Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/bliblidotcom/blibli-backend-framework</url>
     </repository>
   </distributionManagement>
 
