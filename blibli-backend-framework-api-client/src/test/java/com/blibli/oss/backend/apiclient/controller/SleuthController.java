@@ -3,6 +3,7 @@ package com.blibli.oss.backend.apiclient.controller;
 import brave.Tracer;
 import brave.propagation.ExtraFieldPropagation;
 import com.blibli.oss.backend.apiclient.client.SleuthApiClient;
+import com.blibli.oss.backend.apiclient.client.model.GenericResponse;
 import com.blibli.oss.backend.sleuth.configuration.SleuthConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -46,6 +49,23 @@ public class SleuthController {
     map.put("headerFirstName", exchange.getRequest().getHeaders().getFirst(SleuthConfiguration.HTTP_BAGGAGE_PREFIX + "firstname"));
     map.put("headerLastName", exchange.getRequest().getHeaders().getFirst(SleuthConfiguration.HTTP_BAGGAGE_PREFIX + "lastname"));
     return Mono.just(map);
+  }
+
+  @GetMapping(
+    value = "/list",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Mono<GenericResponse<List<String>>> list() {
+    return sleuthApiClient.names(Arrays.asList("Eko", "Kurniawan", "Khannedy"));
+  }
+
+  @GetMapping(
+    value = "/names",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Mono<GenericResponse<List<String>>> names(@RequestParam("names") List<String> names) {
+    GenericResponse<List<String>> response = new GenericResponse<>(names);
+    return Mono.just(response);
   }
 
 }

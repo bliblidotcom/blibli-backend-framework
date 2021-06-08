@@ -287,7 +287,12 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
     builder.path(metadata.getPaths().get(methodName));
 
     metadata.getQueryParamPositions().get(methodName).forEach((paramName, position) -> {
-      builder.queryParam(paramName, arguments[position]);
+      if (arguments[position] instanceof Collection) {
+        Collection collection = (Collection) arguments[position];
+        builder.queryParam(paramName, collection);
+      } else {
+        builder.queryParam(paramName, arguments[position]);
+      }
     });
 
     Map<String, Object> uriVariables = new HashMap<>();

@@ -36,4 +36,18 @@ public class SleuthApiClientTest {
       .jsonPath("$.firstName").isEqualTo("Eko")
       .jsonPath("$.lastName").isEqualTo("Khannedy");
   }
+
+  @Test
+  void testList() {
+    webTestClient.get()
+      .uri(uriBuilder -> uriBuilder
+        .path("/list")
+        .build())
+      .exchange()
+      .expectStatus().is2xxSuccessful()
+      .expectBody()
+      .jsonPath("$.value[0]").isEqualTo("Eko")
+      .jsonPath("$.value[1]").isEqualTo("Kurniawan")
+      .jsonPath("$.value[2]").isEqualTo("Khannedy");
+  }
 }
