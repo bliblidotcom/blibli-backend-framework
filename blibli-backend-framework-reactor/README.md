@@ -112,3 +112,49 @@ blibli.backend.reactor.scheduler.configs.THREAD_POOL.thread-pool.queue-type=link
 blibli.backend.reactor.scheduler.configs.THREAD_POOL.thread-pool.queue-size=100
 blibli.backend.reactor.scheduler.configs.THREAD_POOL.thread-pool.allow-core-thread-time-out=true
 ```
+
+## Reactive Wrapper
+
+Sometimes we want to need to use non-reactive library in our application, like Spring Data, or SDK Client.
+This module product Reactive Wrapper, it's library to split scheduler usage between reactive code and non-reactive code.
+
+```properties
+blibli.backend.reactor.wrapper.configs.WRAPPER_NAME.subscriber=NEW_PARALLEL
+blibli.backend.reactor.wrapper.configs.WRAPPER_NAME.publisher=NEW_SINGLE
+```
+
+You also can set default scheduler for reactive wrapper, so if for example no scheduler is found, it will use default scheduler
+
+```properties
+blibli.backend.reactor.wrapper.default-subscriber=IMMEDIATE
+blibli.backend.reactor.wrapper.default-publisher=IMMEDIATE
+```  
+
+To use reactive wrapper, you can use `ReactiveWrapper` interface.
+
+```java
+class ReactiveWrapperTest {
+
+  @Autowired
+  private SchedulerHelper schedulerHelper;
+
+  @Autowired
+  private ReactiveWrapperHelper reactiveWrapperHelper;
+
+  private ReactiveWrapper reactiveWrapperRepository;
+
+  private ReactiveWrapper reactiveWrapperNotFound;
+
+  @BeforeEach
+  void setUp() {
+    reactiveWrapperRepository = reactiveWrapperHelper.of("REPOSITORY");
+    reactiveWrapperNotFound = reactiveWrapperHelper.of("WRAPPER_NAME");
+  }
+
+  @Test
+  void testMono() {
+    Mono.fromCallable(() -> "Eko")
+      .flatMap(value -> reactiveWrapperRepository.mono(value::toUpperCase)) // reactive wrapper will executed in different scheduler
+      .subscribeOn(schedulerHelper.of("YOUR_SCHEDULER"));
+  }
+```
