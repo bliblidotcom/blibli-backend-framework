@@ -28,6 +28,8 @@ public class PropertiesHelper {
         target.setWriteTimeout(source.getWriteTimeout());
       }
 
+      source.getParams().forEach((key, value) -> target.getParams().put(key, value));
+
       source.getHeaders().forEach((key, value) -> target.getHeaders().put(key, value));
 
       source.getInterceptors().forEach(aClass -> target.getInterceptors().add(aClass));

@@ -68,6 +68,8 @@ public class ApiClientProperties {
 
     private Map<String, String> headers = new HashMap<>();
 
+    private Map<String, String> params = new HashMap<>();
+
     private List<Class<? extends ApiClientInterceptor>> interceptors = new ArrayList<>();
 
     private List<Class<? extends ApiClientWebClientCustomizer>> webClientCustomizers = new ArrayList<>();
