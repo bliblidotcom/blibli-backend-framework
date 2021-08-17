@@ -68,4 +68,20 @@ public class SleuthController {
     return Mono.just(response);
   }
 
+  @GetMapping(
+    value = "/param",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Mono<GenericResponse<Object>> param(ServerWebExchange exchange) {
+    return Mono.just(new GenericResponse<>(exchange.getRequest().getQueryParams()));
+  }
+
+  @GetMapping(
+    value = "/test-param",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Mono<GenericResponse<Object>> testParam() {
+    return sleuthApiClient.param();
+  }
+
 }

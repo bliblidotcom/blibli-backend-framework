@@ -48,7 +48,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -294,6 +301,8 @@ public class ApiClientMethodInterceptor implements MethodInterceptor, Initializi
         builder.queryParam(paramName, arguments[position]);
       }
     });
+
+    metadata.getProperties().getParams().forEach(builder::queryParam);
 
     Map<String, Object> uriVariables = new HashMap<>();
     metadata.getPathVariablePositions().get(methodName).forEach((paramName, position) -> {

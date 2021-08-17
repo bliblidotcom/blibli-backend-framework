@@ -29,4 +29,11 @@ public interface SleuthApiClient {
   )
   Mono<GenericResponse<List<String>>> names(@RequestParam("names") List<String> names);
 
+  @RequestMapping(
+    method = RequestMethod.GET,
+    value = "/param",
+    produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  Mono<GenericResponse<Object>> param();
+
 }
