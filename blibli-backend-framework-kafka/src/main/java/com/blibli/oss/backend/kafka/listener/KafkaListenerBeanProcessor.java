@@ -4,6 +4,8 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.KafkaListenerAnnotationBeanPostProcessor;
+import org.springframework.kafka.config.MethodKafkaListenerEndpoint;
+import org.springframework.kafka.support.TopicPartitionOffset;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -13,9 +15,11 @@ public class KafkaListenerBeanProcessor extends KafkaListenerAnnotationBeanPostP
   @Override
   protected void processKafkaListener(KafkaListener kafkaListener, Method method, Object bean, String beanName) {
     Method methodToUse = checkProxy(method, bean);
-    KafkaListenerEndpoint endpoint = new KafkaListenerEndpoint();
+    MethodKafkaListenerEndpoint endpoint = new MethodKafkaListenerEndpoint();
     endpoint.setMethod(methodToUse);
-    processListener(endpoint, kafkaListener, bean, methodToUse, beanName);
+    String[] topics = {};
+    TopicPartitionOffset[] tps = {};
+    processListener(endpoint, kafkaListener, bean, beanName, topics, tps);
   }
 
   private Method checkProxy(Method methodArg, Object bean) {

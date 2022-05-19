@@ -6,7 +6,6 @@ import com.newrelic.api.agent.Segment;
 import com.newrelic.api.agent.Token;
 import com.newrelic.api.agent.TracedMethod;
 import com.newrelic.api.agent.Transaction;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -94,7 +94,7 @@ public class NewRelicIntegrationTest {
         .jsonPath("$.data")
         .isEqualTo("I say Hello World to NAMA");
 
-    Assert.assertEquals("Command HelloWorldCommandImpl.HelloWorldCommandImpl.execute(..)", segmentNameCaptor.getValue());
+    assertEquals("Command HelloWorldCommandImpl.HelloWorldCommandImpl.execute(..)", segmentNameCaptor.getValue());
 
     verify(newRelicAgent).getTransaction();
     verify(transaction).startSegment(segmentNameCaptor.capture());
