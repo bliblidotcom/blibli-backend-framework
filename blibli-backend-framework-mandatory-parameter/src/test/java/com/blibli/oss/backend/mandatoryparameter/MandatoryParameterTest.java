@@ -1,24 +1,17 @@
 package com.blibli.oss.backend.mandatoryparameter;
 
-import com.blibli.oss.backend.mandatoryparameter.model.MandatoryParameter;
-import com.blibli.oss.backend.mandatoryparameter.swagger.annotation.MandatoryParameterAtHeader;
-import com.blibli.oss.backend.mandatoryparameter.swagger.annotation.MandatoryParameterAtQuery;
 import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
-  classes = MandatoryParameterTest.Application.class,
+  classes = TestApplication.class,
   webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 public class MandatoryParameterTest {
@@ -95,30 +88,4 @@ public class MandatoryParameterTest {
       .jsonPath("$.paths./header.get.parameters[*]name").value(Matchers.contains("storeId", "channelId", "clientId", "username", "requestId"));
   }
 
-  @SpringBootApplication
-  public static class Application {
-
-    @MandatoryParameterAtQuery
-    @RestController
-    public static class QueryController {
-
-      @GetMapping("/query")
-      public Mono<MandatoryParameter> query(MandatoryParameter parameter) {
-        return Mono.just(parameter);
-      }
-
-    }
-
-    @MandatoryParameterAtHeader
-    @RestController
-    public static class HeaderController {
-
-      @GetMapping("/header")
-      public Mono<MandatoryParameter> header(MandatoryParameter parameter) {
-        return Mono.just(parameter);
-      }
-
-    }
-
-  }
 }
