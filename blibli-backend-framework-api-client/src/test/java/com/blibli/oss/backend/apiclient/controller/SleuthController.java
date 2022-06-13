@@ -1,7 +1,7 @@
 package com.blibli.oss.backend.apiclient.controller;
 
 import brave.Tracer;
-import brave.propagation.ExtraFieldPropagation;
+import brave.baggage.BaggageField;
 import com.blibli.oss.backend.apiclient.client.SleuthApiClient;
 import com.blibli.oss.backend.apiclient.client.model.GenericResponse;
 import com.blibli.oss.backend.sleuth.configuration.SleuthConfiguration;
@@ -33,8 +33,8 @@ public class SleuthController {
   )
   public Mono<Map<String, String>> first(@RequestParam("firstName") String firstName,
                                          @RequestParam("lastName") String lastName) {
-    ExtraFieldPropagation.set(tracer.currentSpan().context(), "FirstName", firstName);
-    ExtraFieldPropagation.set(tracer.currentSpan().context(), "LastName", lastName);
+    BaggageField.getByName(tracer.currentSpan().context(), "FirstName").updateValue(tracer.currentSpan().context(), firstName);
+    BaggageField.getByName(tracer.currentSpan().context(), "LastName").updateValue(tracer.currentSpan().context(), lastName);
     return sleuthApiClient.second();
   }
 
@@ -43,9 +43,13 @@ public class SleuthController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public Mono<Map<String, String>> second(ServerWebExchange exchange) {
+
+    exchange.getRequest().getHeaders().forEach((s, strings) ->
+      System.out.println("HEADER " + s + ":" + String.join(",", strings.toArray(new String[0]))));
+
     Map<String, String> map = new HashMap<>();
-    map.put("firstName", ExtraFieldPropagation.get(tracer.currentSpan().context(), "FirstName"));
-    map.put("lastName", ExtraFieldPropagation.get(tracer.currentSpan().context(), "LastName"));
+    map.put("firstName", BaggageField.getByName(tracer.currentSpan().context(), "FirstName").getValue(tracer.currentSpan().context()));
+    map.put("lastName", BaggageField.getByName(tracer.currentSpan().context(), "LastName").getValue(tracer.currentSpan().context()));
     map.put("headerFirstName", exchange.getRequest().getHeaders().getFirst(SleuthConfiguration.HTTP_BAGGAGE_PREFIX + "firstname"));
     map.put("headerLastName", exchange.getRequest().getHeaders().getFirst(SleuthConfiguration.HTTP_BAGGAGE_PREFIX + "lastname"));
     return Mono.just(map);

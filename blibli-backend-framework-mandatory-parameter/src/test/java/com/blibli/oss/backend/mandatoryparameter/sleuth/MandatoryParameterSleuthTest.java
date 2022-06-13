@@ -1,26 +1,17 @@
 package com.blibli.oss.backend.mandatoryparameter.sleuth;
 
-import brave.Tracer;
-import com.blibli.oss.backend.mandatoryparameter.helper.MandatoryParameterHelper;
-import com.blibli.oss.backend.mandatoryparameter.model.MandatoryParameter;
-import com.blibli.oss.backend.mandatoryparameter.swagger.annotation.MandatoryParameterAtQuery;
+import com.blibli.oss.backend.mandatoryparameter.TestApplication;
 import com.blibli.oss.backend.mandatoryparameter.swagger.properties.MandatoryParameterProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
-  classes = MandatoryParameterSleuthTest.Application.class,
+  classes = TestApplication.class,
   webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 public class MandatoryParameterSleuthTest {
@@ -52,37 +43,4 @@ public class MandatoryParameterSleuthTest {
       .jsonPath("$.requestId").isEqualTo("requestId");
   }
 
-  @SpringBootApplication
-  public static class Application {
-
-    @RestController
-    public static class SleuthController {
-
-      @Autowired
-      private SleuthService sleuthService;
-
-      @MandatoryParameterAtQuery
-      @GetMapping(
-        value = "/sleuth",
-        produces = MediaType.APPLICATION_JSON_VALUE
-      )
-      public Mono<MandatoryParameter> mandatoryParameter(MandatoryParameter mandatoryParameter) {
-        return sleuthService.getMandatoryParameter();
-      }
-
-    }
-
-    @Service
-    public static class SleuthService {
-
-      @Autowired
-      private Tracer tracer;
-
-      public Mono<MandatoryParameter> getMandatoryParameter() {
-        return Mono.fromCallable(() -> MandatoryParameterHelper.fromSleuth(tracer.currentSpan().context()));
-      }
-
-    }
-
-  }
 }
