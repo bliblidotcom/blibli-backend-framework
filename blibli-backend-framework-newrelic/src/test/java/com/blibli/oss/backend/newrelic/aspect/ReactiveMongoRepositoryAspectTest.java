@@ -24,10 +24,13 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.repository.query.FluentQuery;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.context.Context;
+
+import java.util.function.Function;
 
 import static com.blibli.oss.backend.newrelic.injector.NewRelicTokenInjectorFilter.TOKEN_CONTEXT_KEY;
 import static com.blibli.oss.backend.newrelic.injector.NewRelicTokenInjectorFilter.TRANSACTION_CONTEXT_KEY;
@@ -219,6 +222,11 @@ public class ReactiveMongoRepositoryAspectTest {
     }
 
     @Override
+    public <S extends DummyData, R, P extends Publisher<R>> P findBy(Example<S> example, Function<FluentQuery.ReactiveFluentQuery<S>, P> queryFunction) {
+      return null;
+    }
+
+    @Override
     public Flux<DummyData> findAll(Sort sort) {
       throw new RuntimeException("NOT IMPLEMENTED");
     }
@@ -291,6 +299,11 @@ public class ReactiveMongoRepositoryAspectTest {
     @Override
     public Mono<Void> delete(DummyData entity) {
       throw new RuntimeException("NOT IMPLEMENTED");
+    }
+
+    @Override
+    public Mono<Void> deleteAllById(Iterable<? extends String> strings) {
+      return null;
     }
 
     @Override

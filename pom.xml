@@ -47,20 +47,20 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.3.0.RELEASE</version>
+    <version>2.7.0</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>com.blibli.oss</groupId>
   <artifactId>blibli-backend-framework</artifactId>
-  <version>0.0.9-SNAPSHOT</version>
+  <version>2.7.0-SNAPSHOT</version>
 
   <name>blibli-backend-framework</name>
   <description>Blibli.com Backend Framework</description>
 
   <properties>
     <java.version>1.8</java.version>
-    <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
+    <spring-cloud.version>2021.0.3</spring-cloud.version>
     <springdoc.version>1.2.26</springdoc.version>
     <blibli-framework.version>${project.version}</blibli-framework.version>
     <embedded.redis.version>0.6</embedded.redis.version>

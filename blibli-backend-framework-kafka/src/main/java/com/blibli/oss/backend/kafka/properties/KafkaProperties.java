@@ -13,6 +13,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("blibli.backend.kafka")
 public class KafkaProperties {
 
+  private boolean aspectj = true;
+
   private LoggingProperties logging = new LoggingProperties();
 
   @Data

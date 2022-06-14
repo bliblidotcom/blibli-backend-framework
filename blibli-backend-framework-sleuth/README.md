@@ -46,16 +46,16 @@ Sleuth module will automatically register all fields, so we can set and get extr
 private Tracer tracer;
 
 // set extra field
-ExtraFieldPropagation.set(span.context(), "Hello", "Value");
-ExtraFieldPropagation.set(span.context(), "World", "Value");
-ExtraFieldPropagation.set(span.context(), "ClientId", "Value");
-ExtraFieldPropagation.set(span.context(), "StoreId", "Value");
+BaggageField.getByName(span.context(), "Hello").updateValue(span.context(), "Value");
+BaggageField.getByName(span.context(), "World").updateValue(span.context(), "Value");
+BaggageField.getByName(span.context(), "ClientId").updateValue(span.context(), "Value");
+BaggageField.getByName(span.context(), "StoreId").updateValue(span.context(), "Value");
 
 // get extra field
-String hello = ExtraFieldPropagation.get(span.context(), "Hello");
-String world = ExtraFieldPropagation.get(span.context(), "World");
-String clientId = ExtraFieldPropagation.get(span.context(), "ClientId");
-String storeId = ExtraFieldPropagation.get(span.context(), "StoreId");
+String hello = BaggageField.getByName(span.context(), "Hello").getValue(span.context());
+String world = BaggageField.getByName(span.context(), "World").getValue(span.context());
+String clientId = BaggageField.getByName(span.context(), "ClientId").getValue(span.context());
+String storeId = BaggageField.getByName(span.context(), "StoreId").getValue(span.context());
 
 ``` 
 
@@ -75,7 +75,7 @@ public class ExampleSleuthWebFilter implements SleuthWebFilter {
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain, Span currentSpan) {
     // do something with currentSpan
-    ExtraFieldPropagation.set(currentSpan.context(), "Key", "Value");
+    BaggageField.getByName(currentSpan.context(), "Key").updateValue(currentSpan.context(), "Value");
 
     return chain.filter(exchange);
   }

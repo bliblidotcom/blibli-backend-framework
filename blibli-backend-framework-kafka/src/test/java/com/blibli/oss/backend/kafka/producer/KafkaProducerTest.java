@@ -20,6 +20,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = KafkaProducerTest.Application.class)
 @EmbeddedKafka(
@@ -29,7 +32,7 @@ import reactor.core.scheduler.Schedulers;
 @DirtiesContext
 class KafkaProducerTest {
 
-  public static final String SAMPLE_TOPIC = "SAMPLE_TOPIC";
+  public static final String SAMPLE_TOPIC = "HELLO";
 
   @Autowired
   private KafkaProducer kafkaProducer;
@@ -42,7 +45,7 @@ class KafkaProducerTest {
   @BeforeEach
   void setUp() {
     consumer = KafkaHelper.newConsumer(broker);
-    broker.consumeFromEmbeddedTopics(consumer, SAMPLE_TOPIC);
+    consumer.subscribe(Collections.singletonList(SAMPLE_TOPIC));
   }
 
   @AfterEach
@@ -52,45 +55,45 @@ class KafkaProducerTest {
 
   @Test
   void testSendSuccess() {
-    kafkaProducer.send(SAMPLE_TOPIC, "key", "kafka value").subscribe();
-    ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC);
+    kafkaProducer.send(SAMPLE_TOPIC, "key 1", "kafka value 1").subscribe();
+    ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC, 5000L);
 
-    Assertions.assertEquals(record.key(), "key");
-    Assertions.assertEquals(record.value(), "kafka value");
+    Assertions.assertEquals(record.key(), "key 1");
+    Assertions.assertEquals(record.value(), "kafka value 1");
   }
 
   @Test
   void testSendLazy() {
     Assertions.assertThrows(IllegalStateException.class, () -> {
-      kafkaProducer.send(SAMPLE_TOPIC, "key", "kafka value"); // not subscribe it
+      kafkaProducer.send(SAMPLE_TOPIC, "key 2", "kafka value 2"); // not subscribe it
       ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC, 5_000L);
     });
   }
 
   @Test
   void testSendOn() {
-    kafkaProducer.sendOn(SAMPLE_TOPIC, "key", "kafka value", Schedulers.elastic()).subscribe();
-    ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC);
+    kafkaProducer.sendOn(SAMPLE_TOPIC, "key 3", "kafka value 3", Schedulers.boundedElastic()).subscribe();
+    ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC, 5000L);
 
-    Assertions.assertEquals(record.key(), "key");
-    Assertions.assertEquals(record.value(), "kafka value");
+    Assertions.assertEquals(record.key(), "key 3");
+    Assertions.assertEquals(record.value(), "kafka value 3");
   }
 
   @Test
   void testSendOnLazy() {
     Assertions.assertThrows(IllegalStateException.class, () -> {
-      kafkaProducer.sendOn(SAMPLE_TOPIC, "key", "kafka value", Schedulers.elastic()); // not subscribe it
+      kafkaProducer.sendOn(SAMPLE_TOPIC, "key 4", "kafka value 4", Schedulers.boundedElastic()); // not subscribe it
       ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC, 5_000L);
     });
   }
 
   @Test
   void testSendAndSubscribe() {
-    kafkaProducer.sendAndSubscribe(SAMPLE_TOPIC, "key", "kafka value", Schedulers.elastic());
-    ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC);
+    kafkaProducer.sendAndSubscribe(SAMPLE_TOPIC, "key 5", "kafka value 5", Schedulers.boundedElastic());
+    ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, SAMPLE_TOPIC, 5000L);
 
-    Assertions.assertEquals(record.key(), "key");
-    Assertions.assertEquals(record.value(), "kafka value");
+    Assertions.assertEquals(record.key(), "key 5");
+    Assertions.assertEquals(record.value(), "kafka value 5");
   }
 
   @SpringBootApplication

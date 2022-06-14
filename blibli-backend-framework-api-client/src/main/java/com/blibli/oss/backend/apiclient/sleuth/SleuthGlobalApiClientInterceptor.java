@@ -1,7 +1,7 @@
 package com.blibli.oss.backend.apiclient.sleuth;
 
 import brave.Tracer;
-import brave.propagation.ExtraFieldPropagation;
+import brave.baggage.BaggageField;
 import com.blibli.oss.backend.apiclient.interceptor.GlobalApiClientInterceptor;
 import com.blibli.oss.backend.apiclient.properties.ApiClientProperties;
 import com.blibli.oss.backend.sleuth.configuration.SleuthConfiguration;
@@ -23,7 +23,7 @@ public class SleuthGlobalApiClientInterceptor implements GlobalApiClientIntercep
     if (properties.getSleuth().isEnabled() && tracer.currentSpan() != null) {
       return Mono.fromCallable(() -> {
         ClientRequest.Builder builder = ClientRequest.from(request);
-        ExtraFieldPropagation.getAll(tracer.currentSpan().context()).forEach((key, value) -> {
+        BaggageField.getAllValues(tracer.currentSpan().context()).forEach((key, value) -> {
           builder.header(SleuthConfiguration.HTTP_BAGGAGE_PREFIX + key, value);
         });
         return builder.build();
