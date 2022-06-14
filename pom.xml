@@ -23,9 +23,9 @@
   </modules>
 
   <scm>
-    <connection>scm:git:git@github.com:bliblidotcom/blibli-backend-framework.git</connection>
-    <developerConnection>scm:git:git@github.com:bliblidotcom/blibli-backend-framework.git</developerConnection>
-    <url>https://github.com/bliblidotcom/blibli-backend-framework</url>
+    <connection>scm:git:ssh://git@stash.gdn-app.com:7999/springbootplugin/blibli-backend-framework.git</connection>
+    <developerConnection>scm:git:ssh://git@stash.gdn-app.com:7999/springbootplugin/blibli-backend-framework.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
