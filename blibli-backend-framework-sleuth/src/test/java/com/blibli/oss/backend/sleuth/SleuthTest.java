@@ -2,7 +2,7 @@ package com.blibli.oss.backend.sleuth;
 
 import brave.Span;
 import brave.Tracer;
-import brave.propagation.ExtraFieldPropagation;
+import brave.baggage.BaggageField;
 import com.blibli.oss.backend.sleuth.fields.SleuthExtraFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,26 +28,23 @@ public class SleuthTest {
   void testExists() {
     Span span = tracer.newTrace();
 
-    ExtraFieldPropagation.set(span.context(), "Eko", "Value");
-    ExtraFieldPropagation.set(span.context(), "Kurniawan", "Value");
-    ExtraFieldPropagation.set(span.context(), "Khannedy", "Value");
-    ExtraFieldPropagation.set(span.context(), "Hello", "Value");
-    ExtraFieldPropagation.set(span.context(), "World", "Value");
+    BaggageField.getByName(span.context(), "Eko").updateValue(span.context(), "Value");
+    BaggageField.getByName(span.context(), "Kurniawan").updateValue(span.context(), "Value");
+    BaggageField.getByName(span.context(), "Khannedy").updateValue(span.context(), "Value");
+    BaggageField.getByName(span.context(), "Hello").updateValue(span.context(), "Value");
+    BaggageField.getByName(span.context(), "World").updateValue(span.context(), "Value");
 
-    assertEquals("Value", ExtraFieldPropagation.get(span.context(), "Eko"));
-    assertEquals("Value", ExtraFieldPropagation.get(span.context(), "Kurniawan"));
-    assertEquals("Value", ExtraFieldPropagation.get(span.context(), "Khannedy"));
-    assertEquals("Value", ExtraFieldPropagation.get(span.context(), "Hello"));
-    assertEquals("Value", ExtraFieldPropagation.get(span.context(), "World"));
+    assertEquals("Value", BaggageField.getByName(span.context(), "Eko").getValue(span.context()));
+    assertEquals("Value", BaggageField.getByName(span.context(), "Kurniawan").getValue(span.context()));
+    assertEquals("Value", BaggageField.getByName(span.context(), "Khannedy").getValue(span.context()));
+    assertEquals("Value", BaggageField.getByName(span.context(), "Hello").getValue(span.context()));
+    assertEquals("Value", BaggageField.getByName(span.context(), "World").getValue(span.context()));
   }
 
   @Test
   void testNotExists() {
     Span span = tracer.newTrace();
-
-    ExtraFieldPropagation.set(span.context(), "NotExists", "Value");
-
-    assertNull(ExtraFieldPropagation.get(span.context(), "NotExists"));
+    assertNull(BaggageField.getByName(span.context(), "NotExists"));
   }
 
   @SpringBootApplication

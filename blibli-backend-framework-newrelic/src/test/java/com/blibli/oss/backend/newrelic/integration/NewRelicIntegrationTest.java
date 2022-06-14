@@ -6,8 +6,8 @@ import com.newrelic.api.agent.Segment;
 import com.newrelic.api.agent.Token;
 import com.newrelic.api.agent.TracedMethod;
 import com.newrelic.api.agent.Transaction;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,7 +94,7 @@ public class NewRelicIntegrationTest {
         .jsonPath("$.data")
         .isEqualTo("I say Hello World to NAMA");
 
-    Assert.assertEquals("Command HelloWorldCommandImpl.HelloWorldCommandImpl.execute(..)", segmentNameCaptor.getValue());
+    Assertions.assertEquals("Command HelloWorldCommandImpl.HelloWorldCommandImpl.execute(..)", segmentNameCaptor.getValue());
 
     verify(newRelicAgent).getTransaction();
     verify(transaction).startSegment(segmentNameCaptor.capture());

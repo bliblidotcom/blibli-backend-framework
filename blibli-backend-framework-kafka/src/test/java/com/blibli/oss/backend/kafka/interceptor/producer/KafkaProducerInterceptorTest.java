@@ -26,6 +26,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -52,7 +54,7 @@ class KafkaProducerInterceptorTest {
   @BeforeEach
   void setUp() {
     consumer = KafkaHelper.newConsumer(broker);
-    broker.consumeFromEmbeddedTopics(consumer, TOPIC);
+    consumer.subscribe(Collections.singletonList(TOPIC));
   }
 
   @AfterEach
@@ -63,7 +65,7 @@ class KafkaProducerInterceptorTest {
   @Test
   void testInterceptor() {
     errorFlag.setError(false);
-    kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.elastic());
+    kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.boundedElastic());
 
     ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
 

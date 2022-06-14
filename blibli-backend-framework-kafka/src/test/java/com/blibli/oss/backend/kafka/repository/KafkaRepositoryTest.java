@@ -27,6 +27,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Collections;
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = KafkaRepositoryTest.Application.class)
 @EmbeddedKafka(
@@ -54,7 +56,7 @@ public class KafkaRepositoryTest {
   @BeforeEach
   void setUp() {
     consumer = KafkaHelper.newConsumer(broker);
-    broker.consumeFromEmbeddedTopics(consumer, TOPIC);
+    consumer.subscribe(Collections.singletonList(TOPIC));
   }
 
   @AfterEach
@@ -64,7 +66,7 @@ public class KafkaRepositoryTest {
 
   @Test
   void testProductSuccess() throws JsonProcessingException {
-    productKafkaRepository.sendAndSubscribe(Product.builder().id("id").name("name").build(), Schedulers.elastic());
+    productKafkaRepository.sendAndSubscribe(Product.builder().id("id").name("name").build(), Schedulers.boundedElastic());
     ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
 
     Assertions.assertEquals(record.key(), "id");
@@ -72,7 +74,7 @@ public class KafkaRepositoryTest {
     Assertions.assertEquals(product.getId(), "id");
     Assertions.assertEquals(product.getName(), "name");
 
-    productKafkaRepository.sendAndSubscribe(Product.builder().id("id").name("name").build(), Schedulers.elastic());
+    productKafkaRepository.sendAndSubscribe(Product.builder().id("id").name("name").build(), Schedulers.boundedElastic());
     record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
 
     Assertions.assertEquals(record.key(), "id");
@@ -83,7 +85,7 @@ public class KafkaRepositoryTest {
 
   @Test
   void testCustomerSuccess() throws JsonProcessingException {
-    customerKafkaRepository.sendAndSubscribe(Customer.builder().id("id").name("name").build(), Schedulers.elastic());
+    customerKafkaRepository.sendAndSubscribe(Customer.builder().id("id").name("name").build(), Schedulers.boundedElastic());
     ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
 
     Assertions.assertEquals(record.key(), "id");

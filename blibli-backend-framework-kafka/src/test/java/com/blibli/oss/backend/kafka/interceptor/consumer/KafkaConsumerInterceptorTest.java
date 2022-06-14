@@ -8,10 +8,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,13 +22,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.scheduler.Schedulers;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = KafkaConsumerInterceptorTest.Application.class)
 @EmbeddedKafka(
+  partitions = 1,
   topics = {KafkaConsumerInterceptorTest.TOPIC, KafkaConsumerInterceptorTest.TOPIC_GOODBYE}
 )
 @DirtiesContext
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class KafkaConsumerInterceptorTest {
 
   public static final String TOPIC = "KafkaConsumerInterceptorTest";
@@ -58,7 +58,7 @@ class KafkaConsumerInterceptorTest {
   @BeforeEach
   void setUp() {
     consumer = KafkaHelper.newConsumer(broker);
-    broker.consumeFromEmbeddedTopics(consumer, TOPIC);
+    consumer.subscribe(Collections.singletonList(TOPIC));
 
     helloInterceptor.reset();
     counterInterceptor.reset();
@@ -70,14 +70,15 @@ class KafkaConsumerInterceptorTest {
   }
 
   @Test
+  @Order(4)
   void testListener() throws InterruptedException {
-    kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.elastic());
+    kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.boundedElastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
-    Assertions.assertEquals(helloListener.key, "key");
-    Assertions.assertEquals(helloListener.value, "value");
+    Assertions.assertEquals(helloListener.getKey(), "key");
+    Assertions.assertEquals(helloListener.getValue(), "value");
 
-    kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.elastic());
+    kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.boundedElastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
     Assertions.assertEquals(helloInterceptor.beforeConsume, "value");
@@ -87,8 +88,19 @@ class KafkaConsumerInterceptorTest {
   }
 
   @Test
+  @Order(3)
+  void testListenerWithInterceptor() throws InterruptedException {
+    kafkaProducer.sendAndSubscribe(TOPIC_GOODBYE, "key", "value", Schedulers.boundedElastic());
+    Thread.sleep(4_000L); // wait 5 seconds until message received by listener
+
+    Assertions.assertEquals(1, counterInterceptor.getBeforeConsume());
+    Assertions.assertEquals(1, counterInterceptor.getAfterSuccessConsume());
+  }
+
+  @Test
+  @Order(2)
   void testInterceptorError() throws InterruptedException {
-    kafkaProducer.sendAndSubscribe(TOPIC, "error", "value", Schedulers.elastic());
+    kafkaProducer.sendAndSubscribe(TOPIC, "error", "value", Schedulers.boundedElastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
     Assertions.assertEquals(helloInterceptor.beforeConsume, "value");
@@ -98,22 +110,14 @@ class KafkaConsumerInterceptorTest {
   }
 
   @Test
+  @Order(1)
   void testInterceptorSkip() throws InterruptedException {
-    kafkaProducer.sendAndSubscribe(TOPIC, "skip", "value", Schedulers.elastic());
+    kafkaProducer.sendAndSubscribe(TOPIC, "skip", "value", Schedulers.boundedElastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
     Assertions.assertNotEquals(helloListener.value, "skip");
     Assertions.assertEquals(0, counterInterceptor.getBeforeConsume());
     Assertions.assertEquals(0, counterInterceptor.getAfterSuccessConsume());
-  }
-
-  @Test
-  void testInterceptorIsSupported() throws InterruptedException {
-    kafkaProducer.sendAndSubscribe(TOPIC_GOODBYE, "key", "value", Schedulers.elastic());
-    Thread.sleep(4_000L); // wait 5 seconds until message received by listener
-
-    Assertions.assertEquals(1, counterInterceptor.getBeforeConsume());
-    Assertions.assertEquals(1, counterInterceptor.getAfterSuccessConsume());
   }
 
   @SpringBootApplication
