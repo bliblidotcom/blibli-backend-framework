@@ -3,7 +3,8 @@
 BlibliPipeline ([
   type : "java",
   modules: [
-    Docker: null
+    Docker: null,
+    Analysis: null
   ],
   deploy_branch_regex : "(master|release/.+)",
   application : [
