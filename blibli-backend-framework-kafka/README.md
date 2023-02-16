@@ -137,3 +137,11 @@ blibli.backend.kafka.logging.before-consume=true
 blibli.backend.kafka.logging.after-success-consume=true
 blibli.backend.kafka.logging.after-failed-consume=true
 ```
+
+By default if the log interceptor is turned on it will show the payload on each log, we can make it excluded from the log to save log spaces by setting these properties
+```properties
+blibli.backend.kafka.logging.before-send-exclude-event=true
+blibli.backend.kafka.logging.before-consume-exclude-event=true
+blibli.backend.kafka.logging.after-success-consume-exclude-event=true
+blibli.backend.kafka.logging.after-failed-consume-exclude-event=true
+```
