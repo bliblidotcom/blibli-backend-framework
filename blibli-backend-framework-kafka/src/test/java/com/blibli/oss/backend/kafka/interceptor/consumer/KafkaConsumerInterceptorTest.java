@@ -3,6 +3,7 @@ package com.blibli.oss.backend.kafka.interceptor.consumer;
 import com.blibli.oss.backend.kafka.interceptor.KafkaConsumerInterceptor;
 import com.blibli.oss.backend.kafka.producer.KafkaProducer;
 import com.blibli.oss.backend.kafka.producer.helper.KafkaHelper;
+import com.blibli.oss.backend.kafka.properties.KafkaProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
@@ -24,7 +27,9 @@ import reactor.core.scheduler.Schedulers;
 import java.lang.reflect.Method;
 import java.util.Collections;
 
-@ExtendWith(SpringExtension.class)
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith({SpringExtension.class, OutputCaptureExtension.class})
 @SpringBootTest(classes = KafkaConsumerInterceptorTest.Application.class)
 @EmbeddedKafka(
   partitions = 1,
@@ -53,6 +58,9 @@ class KafkaConsumerInterceptorTest {
   @Autowired
   private EmbeddedKafkaBroker broker;
 
+  @Autowired
+  private KafkaProperties kafkaProperties;
+
   private Consumer<String, String> consumer;
 
   @BeforeEach
@@ -62,6 +70,10 @@ class KafkaConsumerInterceptorTest {
 
     helloInterceptor.reset();
     counterInterceptor.reset();
+
+    kafkaProperties.getLogging().setBeforeConsumeExcludeEvent(false);
+    kafkaProperties.getLogging().setAfterSuccessExcludeEvent(false);
+    kafkaProperties.getLogging().setAfterFailedExcludeEvent(false);
   }
 
   @AfterEach
@@ -70,7 +82,7 @@ class KafkaConsumerInterceptorTest {
   }
 
   @Test
-  @Order(4)
+  @Order(6)
   void testListener() throws InterruptedException {
     kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.boundedElastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
@@ -88,18 +100,49 @@ class KafkaConsumerInterceptorTest {
   }
 
   @Test
-  @Order(3)
-  void testListenerWithInterceptor() throws InterruptedException {
+  @Order(4)
+  void testListenerWithInterceptor(CapturedOutput output) throws InterruptedException {
     kafkaProducer.sendAndSubscribe(TOPIC_GOODBYE, "key", "value", Schedulers.boundedElastic());
     Thread.sleep(4_000L); // wait 5 seconds until message received by listener
 
     Assertions.assertEquals(1, counterInterceptor.getBeforeConsume());
     Assertions.assertEquals(1, counterInterceptor.getAfterSuccessConsume());
+
+    assertTrue(
+      output.getOut()
+        .contains("Receive from topic " + TOPIC_GOODBYE + " with message key:value")
+    );
+    assertTrue(
+      output.getOut()
+        .contains("Success consume from topic " + TOPIC_GOODBYE + " with message key:value")
+    );
+  }
+
+  @Test
+  @Order(5)
+  void testListenerWithInterceptorExcludeEventOnLogs(CapturedOutput output) throws InterruptedException {
+    kafkaProperties.getLogging().setBeforeConsumeExcludeEvent(true);
+    kafkaProperties.getLogging().setAfterSuccessExcludeEvent(true);
+
+    kafkaProducer.sendAndSubscribe(TOPIC_GOODBYE, "key", "value", Schedulers.boundedElastic());
+    Thread.sleep(4_000L); // wait 5 seconds until message received by listener
+
+    Assertions.assertEquals(1, counterInterceptor.getBeforeConsume());
+    Assertions.assertEquals(1, counterInterceptor.getAfterSuccessConsume());
+
+    assertTrue(
+      output.getOut()
+        .contains("Receive from topic " + TOPIC_GOODBYE + " with message key: key")
+    );
+    assertTrue(
+      output.getOut()
+        .contains("Success consume from topic " + TOPIC_GOODBYE + " with message key: key")
+    );
   }
 
   @Test
   @Order(2)
-  void testInterceptorError() throws InterruptedException {
+  void testInterceptorError(CapturedOutput output) throws InterruptedException {
     kafkaProducer.sendAndSubscribe(TOPIC, "error", "value", Schedulers.boundedElastic());
     Thread.sleep(2_000L); // wait 5 seconds until message received by listener
 
@@ -107,6 +150,39 @@ class KafkaConsumerInterceptorTest {
     Assertions.assertEquals(helloInterceptor.afterFailed, "value");
     Assertions.assertEquals(0, counterInterceptor.getBeforeConsume());
     Assertions.assertEquals(0, counterInterceptor.getAfterSuccessConsume());
+
+    assertTrue(
+      output.getOut()
+        .contains("Receive from topic " + TOPIC + " with message error:value")
+    );
+    assertTrue(
+      output.getOut()
+        .contains("Failed consume from topic " + TOPIC + " with message error:value")
+    );
+  }
+
+  @Test
+  @Order(3)
+  void testInterceptorErrorExcludeEventOnLogs(CapturedOutput output) throws InterruptedException {
+    kafkaProperties.getLogging().setBeforeConsumeExcludeEvent(true);
+    kafkaProperties.getLogging().setAfterFailedExcludeEvent(true);
+
+    kafkaProducer.sendAndSubscribe(TOPIC, "error", "value", Schedulers.boundedElastic());
+    Thread.sleep(2_000L); // wait 5 seconds until message received by listener
+
+    Assertions.assertEquals(helloInterceptor.beforeConsume, "value");
+    Assertions.assertEquals(helloInterceptor.afterFailed, "value");
+    Assertions.assertEquals(0, counterInterceptor.getBeforeConsume());
+    Assertions.assertEquals(0, counterInterceptor.getAfterSuccessConsume());
+
+    assertTrue(
+      output.getOut()
+        .contains("Receive from topic " + TOPIC + " with message key: error")
+    );
+    assertTrue(
+      output.getOut()
+        .contains("Failed consume from topic " + TOPIC + " with message key: error")
+    );
   }
 
   @Test

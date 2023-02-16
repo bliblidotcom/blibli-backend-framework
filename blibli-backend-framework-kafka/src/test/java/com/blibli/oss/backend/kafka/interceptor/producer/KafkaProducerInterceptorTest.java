@@ -4,6 +4,7 @@ import com.blibli.oss.backend.kafka.interceptor.KafkaProducerInterceptor;
 import com.blibli.oss.backend.kafka.model.ProducerEvent;
 import com.blibli.oss.backend.kafka.producer.KafkaProducer;
 import com.blibli.oss.backend.kafka.producer.helper.KafkaHelper;
+import com.blibli.oss.backend.kafka.properties.KafkaProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
@@ -30,7 +33,7 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, OutputCaptureExtension.class})
 @SpringBootTest(classes = KafkaProducerInterceptorTest.Application.class)
 @EmbeddedKafka(
   topics = KafkaProducerInterceptorTest.TOPIC
@@ -51,10 +54,15 @@ class KafkaProducerInterceptorTest {
   @Autowired
   private ErrorFlag errorFlag;
 
+  @Autowired
+  private KafkaProperties kafkaProperties;
+
   @BeforeEach
   void setUp() {
     consumer = KafkaHelper.newConsumer(broker);
     consumer.subscribe(Collections.singletonList(TOPIC));
+
+    kafkaProperties.getLogging().setBeforeConsumeExcludeEvent(false);
   }
 
   @AfterEach
@@ -63,7 +71,7 @@ class KafkaProducerInterceptorTest {
   }
 
   @Test
-  void testInterceptor() {
+  void testInterceptor(CapturedOutput output) {
     errorFlag.setError(false);
     kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.boundedElastic());
 
@@ -71,6 +79,31 @@ class KafkaProducerInterceptorTest {
 
     Assertions.assertEquals(record.key(), "key");
     Assertions.assertEquals(record.value(), "value changed");
+
+    assertTrue(
+      output.getOut()
+        .contains("Send message to kafka : " +
+          "ProducerEvent(topic=KafkaProducerInterceptorTest, partition=null, headers=null, key=key, value=value, timestamp=null)")
+    );
+  }
+
+  @Test
+  void testInterceptorExcludeEventOnLogs(CapturedOutput output) {
+    kafkaProperties.getLogging().setBeforeSendExcludeEvent(true);
+
+    errorFlag.setError(false);
+    kafkaProducer.sendAndSubscribe(TOPIC, "key", "value", Schedulers.boundedElastic());
+
+    ConsumerRecord<String, String> record = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
+
+    Assertions.assertEquals(record.key(), "key");
+    Assertions.assertEquals(record.value(), "value changed");
+
+    assertTrue(
+      output.getOut()
+        .contains("Send message to kafka : " +
+          "{topic: KafkaProducerInterceptorTest, key: key}")
+    );
   }
 
   @Test

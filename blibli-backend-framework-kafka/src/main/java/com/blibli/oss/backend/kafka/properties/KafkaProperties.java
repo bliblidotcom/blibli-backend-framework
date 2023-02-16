@@ -31,6 +31,14 @@ public class KafkaProperties {
 
     private boolean afterFailedConsume = false;
 
+    private boolean beforeSendExcludeEvent = false;
+
+    private boolean beforeConsumeExcludeEvent = false;
+
+    private boolean afterSuccessExcludeEvent = false;
+
+    private boolean afterFailedExcludeEvent = false;
+
   }
 
 }
