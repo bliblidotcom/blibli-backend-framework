@@ -20,7 +20,11 @@ public class LogKafkaProducerInterceptor implements KafkaProducerInterceptor, Or
   @Override
   public ProducerEvent beforeSend(ProducerEvent event) {
     if (kafkaProperties.getLogging().isBeforeSend()) {
-      log.info("Send message to kafka : {}", event);
+      if (kafkaProperties.getLogging().isBeforeSendExcludeEvent()) {
+        log.info("Send message to kafka : {topic: {}, key: {}}", event.getTopic(), event.getKey());
+      } else {
+        log.info("Send message to kafka : {}", event);
+      }
     }
     return event;
   }
