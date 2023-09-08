@@ -64,7 +64,7 @@
     <springdoc.version>1.2.26</springdoc.version>
     <blibli-framework.version>${project.version}</blibli-framework.version>
     <embedded.redis.version>0.6</embedded.redis.version>
-    <wiremock.version>2.26.3</wiremock.version>
+    <wiremock.version>2.35.1</wiremock.version>
     <elasticsearch.version>6.4.0</elasticsearch.version>
     <newrelic-api.version>5.11.0</newrelic-api.version>
   </properties>
